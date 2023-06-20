@@ -22,6 +22,8 @@ The contracts are [live on Mainnet](https://etherscan.io/address/0x5694010444cc8
 
 Use the [Radioactive Punks OS site](https://radioactivepunks.xyz) to view any punk's image and attributes stored on-chain with PUNK LOOKUP app.
 
+![Screen Shot 2023-06-20 at 5 19 10 PM](https://github.com/johnnyshankman/radioactive-punks-onchain/assets/6632701/290d5d91-b502-45a4-85a1-262eb5cc5853)
+
 Radioactive Punks can be bought and explore on [our site](https://radioactivepunks.xyz) and on [OpenSea](https://opensea.io/collection/radioactive-punks) etc.
 
 ## Setting Up
