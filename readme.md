@@ -2,8 +2,6 @@
 
 Getting sludgy on-chain.
 
-<img width="504" alt="Screen Shot 2023-06-19 at 5 42 20 PM" src="https://github.com/johnnyshankman/radioactive-punks-onchain/assets/6632701/8f080d3c-a998-4507-93fd-eeba276bd14b">
-
 <img width="504" alt="RPUNKS" src="https://i.seadn.io/gae/HeTVDgjX_Q_LB7OYL-rWnKWFggBcLurUoiOidQXzYhsc1RggxbNW3lzqy3saxrUL0A_14F8iBG8GYeC-U43Hb59Bl908VjxZYPO2?auto=format&dpr=1&w=1920">
 
 ## Where To Find It?
@@ -99,3 +97,7 @@ FFLate Mainnet
 Goerli
 1. `0x86A477028841854D9d02a5BD4fd6936216510A0f`
 2. `0xB948057bdd71835b19Ff90aEa03FAd3Ebb66E870`
+
+## The Results
+
+<img width="504" alt="Screen Shot 2023-06-19 at 5 42 20 PM" src="https://github.com/johnnyshankman/radioactive-punks-onchain/assets/6632701/8f080d3c-a998-4507-93fd-eeba276bd14b">
