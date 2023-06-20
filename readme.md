@@ -4,7 +4,7 @@ The punks that survived the cryptopocalypse, now on-chain.
 
 <img width="504" alt="RPUNKS" src="https://i.seadn.io/gae/HeTVDgjX_Q_LB7OYL-rWnKWFggBcLurUoiOidQXzYhsc1RggxbNW3lzqy3saxrUL0A_14F8iBG8GYeC-U43Hb59Bl908VjxZYPO2?auto=format&dpr=1&w=1920">
 
-## Inspiration, Resources and Shoutouts
+## Shoutouts
 
 This would not have been possible if I was not standing upon the shoulders of these giants:
 * [CryptoadzChained by Wattysart](https://github.com/wattsyart/cryptoadz-chained)
