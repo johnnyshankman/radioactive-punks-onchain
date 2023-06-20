@@ -13,6 +13,7 @@ This would not have been possible if I was not standing upon the shoulders of th
 * [Forgotten Runes Wizard Cult On Chain Migration](https://www.forgottenrunes.com/posts/on-chain)
 * [Chaos Roads by Chain Leftist](https://twitter.com/ChainLeftist)
 * [JPEG On Chain Curation](https://jpg.space/canons/onchain/pending)
+* [Why on chain? by 0xmons](https://blog.0xmons.xyz/79081566310)
 
 Please support their projects, art, and personal social media accounts.
 
