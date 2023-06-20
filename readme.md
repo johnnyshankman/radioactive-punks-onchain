@@ -21,7 +21,7 @@ Please support their projects, art, and personal social media accounts.
 
 The contracts are [live on Mainnet](https://etherscan.io/address/0x5694010444cc8fbbed96c23a65fbc3714f624a26#code).
 
-Use the [Radioactive Punks OS site](https://radioactivepunks.xyz) to view any punk's image and attributes stored on-chain with PUNK LOOKUP app.
+Use the [Radioactive Punks Operating System Website](https://radioactivepunks.xyz) to view any punk's image and attributes stored on-chain with PUNK LOOKUP app.
 
 ![Screen Shot 2023-06-20 at 5 19 10 PM](https://github.com/johnnyshankman/radioactive-punks-onchain/assets/6632701/290d5d91-b502-45a4-85a1-262eb5cc5853)
 
