@@ -103,3 +103,13 @@ Goerli
 ## The Results
 
 <img width="504" alt="Screen Shot 2023-06-19 at 5 42 20 PM" src="https://github.com/johnnyshankman/radioactive-punks-onchain/assets/6632701/8f080d3c-a998-4507-93fd-eeba276bd14b">
+
+## Inspiration, Resources and Shoutouts
+
+This would not have been possible if I was not standing upon the shoulders of these giants:
+* [CryptoadzChained by Wattysart](https://github.com/wattsyart/cryptoadz-chained)https://github.com/wattsyart/cryptoadz-chained
+* [Roses by Dom.eth](https://etherscan.io/address/0x3e743377417cd7ca70dcc9bf08fac55664ed3181)https://etherscan.io/address/0x3e743377417cd7ca70dcc9bf08fac55664ed3181
+* [Cryptocoaster 3D by Xtremetom](https://opensea.io/collection/crypto-coaster-3d)https://opensea.io/collection/crypto-coaster-3d
+* [Forgotten Runes Wizard Cult On Chain Migration](https://www.forgottenrunes.com/posts/on-chain)https://www.forgottenrunes.com/posts/on-chain
+
+Please support their projects, art, and personal social media accounts.
