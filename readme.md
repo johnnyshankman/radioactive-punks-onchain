@@ -65,6 +65,8 @@ Deployment is modular and split across five main components:
 
 `DataCompiler`: helpful functions for concatenating data into valid Data URI formats
 
+Why no use of "SSTORE2" you may ask? Well once you fill up the entire contract with bytes or string data there is no efficiency to be gained by using SSTORE2, it actually reuquires more overhead.
+
 ## How does the punk render?
 
 The JS inflates the SVG layers and then appends them into the DOM, hidden. The JS has the encoded punk data injected into it as a string. The JS then uses that encoded data to selectively unhide the correct layers to render that punk. You now have a responsive SVG representation of your punk.
@@ -115,3 +117,8 @@ Goerli
 ## The Results
 
 <img width="504" alt="Screen Shot 2023-06-19 at 5 42 20 PM" src="https://github.com/johnnyshankman/radioactive-punks-onchain/assets/6632701/8f080d3c-a998-4507-93fd-eeba276bd14b">
+
+## Improvements and Oversights
+
+1. Had I reordered the BytesHyperstructure to use the same indexing as the original NFT contract, I could've avoided the need for the entire `TOKEN_ID_TO_BYTES_LOOKUP` data structure.
+2. I probably could've used SSTORE2 for a few minor strings to save minor amounts of gas upon deployment of the `RadioactivePunksRenderer.sol` file.
