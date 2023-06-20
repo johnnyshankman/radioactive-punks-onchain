@@ -120,5 +120,5 @@ Goerli
 
 ## Improvements and Oversights
 
-1. Had I reordered the BytesHyperstructure to use the same indexing as the original NFT contract, I could've avoided the need for the entire `TOKEN_ID_TO_BYTES_LOOKUP` data structure.
+1. Had I reordered the BytesHyperstructure to use the same indexing as the original NFT contract, I could've avoided the need for the entire `TOKEN_ID_TO_BYTES_LOOKUP` data structure, saving quite a lot of gas on deployment.
 2. I probably could've used SSTORE2 for a few minor strings to save minor amounts of gas upon deployment of the `RadioactivePunksRenderer.sol` file.
