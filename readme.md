@@ -111,5 +111,7 @@ This would not have been possible if I was not standing upon the shoulders of th
 * [Roses by Dom.eth](https://etherscan.io/address/0x3e743377417cd7ca70dcc9bf08fac55664ed3181)
 * [Crypto Coaster by Xtremetom](https://opensea.io/collection/crypto-coaster-3d)
 * [Forgotten Runes Wizard Cult On Chain Migration](https://www.forgottenrunes.com/posts/on-chain)
+* [Chaos Roads by Chain Leftist](https://twitter.com/ChainLeftist)
+* [JPEG On Chain Curation](https://jpg.space/canons/onchain/pending)
 
 Please support their projects, art, and personal social media accounts.
