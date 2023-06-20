@@ -20,7 +20,7 @@ Please support their projects, art, and personal social media accounts.
 
 The contracts are [live on Mainnet](https://etherscan.io/address/0x5694010444cc8fbbed96c23a65fbc3714f624a26#code).
 
-You can use the [Radioactive Punks OS site](https://radioactivepunks.xyz) to view any punk's image and attributes stored on-chain with the Photo Album "app"
+Use the [Radioactive Punks OS site](https://radioactivepunks.xyz) to view any punk's image and attributes stored on-chain with PUNK LOOKUP app.
 
 Radioactive Punks can be bought and explore on [our site](https://radioactivepunks.xyz) and on [OpenSea](https://opensea.io/collection/radioactive-punks) etc.
 
