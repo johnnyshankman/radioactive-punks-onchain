@@ -1,0 +1,50 @@
+{
+  "name": "radioactive-punks-onchain",
+  "version": "1.0.0",
+  "main": "truffle-config.js",
+  "scripts": {
+    "test": "npx hardhat test",
+    "coverage": "hardhat coverage",
+    "compile": "hardhat compile",
+    "lint": "solhint contracts/*",
+    "encode": "node ./encodeTraits.mjs"
+  },
+  "author": "",
+  "license": "ISC",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "@ethersproject/strings": "^5.7.0",
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.6",
+    "@nomicfoundation/hardhat-verify": "^1.0.1",
+    "@nomiclabs/hardhat-ethers": "^2.0.5",
+    "@nomiclabs/hardhat-etherscan": "^2.1.1",
+    "@openzeppelin/contracts": "^4.2.0",
+    "@openzeppelin/test-helpers": "^0.5.15",
+    "chai": "^4.3.7",
+    "dotenv": "^16.0.3",
+    "ethereumjs-abi": "^0.6.8",
+    "ethereumjs-util": "^7.1.0",
+    "ethers": "5.7.2",
+    "ganache": "^7.8.0",
+    "hardhat": "^2.14.0",
+    "hardhat-contract-sizer": "^2.9.0",
+    "hardhat-gas-reporter": "^1.0.9",
+    "node-fetch": "^3.2.10",
+    "original-require": "^1.0.1",
+    "solhint": "^3.3.7",
+    "solidity-coverage": "^0.8.2",
+    "web3": "^1.9.0",
+    "zeppelin-solidity": "^1.12.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnnyshankman/radioactive-punks-onchain.git"
+  },
+  "bugs": {
+    "url": "https://github.com/johnnyshankman/radioactive-punks-onchain/issues"
+  },
+  "homepage": "https://github.com/johnnyshankman/radioactive-punks-onchain#readme",
+  "description": ""
+}
