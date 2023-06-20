@@ -62,29 +62,29 @@ Approximately `0.44560054 Ether` for all contracts combined.
 ## Contracts Deployed
 
 ### RadioactivePunksRenderer.sol
-13 gwei
-0.16157843 ETH
-https://etherscan.io/tx/0xea7806d3943a14c162dc35ad3c720574f3e937934721f096fa7b9f21c722e669
+* 13 gwei
+* 0.16157843 ETH
+* https://etherscan.io/tx/0xea7806d3943a14c162dc35ad3c720574f3e937934721f096fa7b9f21c722e669
 
 ### RadioactivePunksSVGChunk1.sol
-19.27 gwei
-0.103113579422061603 ETH
-https://etherscan.io/tx/0x59b98eb7bdf3a834965e8680d082ed2be6f4b7fa567042aae59c8209dbdd00ee
+* 19.27 gwei
+* 0.103113579422061603 ETH
+* https://etherscan.io/tx/0x59b98eb7bdf3a834965e8680d082ed2be6f4b7fa567042aae59c8209dbdd00ee
 
 ### RadioactivePunksSVGChunk2.sol
-19 gwei
-0.042472866 ETH
-https://etherscan.io/tx/0xbfbab49e347f052ed4433f87cac17bf102006583a83c200a580e6c4af6a6158b
+* 19 gwei
+* 0.042472866 ETH
+* https://etherscan.io/tx/0xbfbab49e347f052ed4433f87cac17bf102006583a83c200a580e6c4af6a6158b
 
 ### RadioactivePunksSVGHyperstructure.sol
-20 gwei
-0.10353022 ETH
-https://etherscan.io/tx/0xa90ec73a34f0855aa986c0e18dd17b250fdd0f72eb8a2bd472aa002989074657
+* 20 gwei
+* 0.10353022 ETH
+* https://etherscan.io/tx/0xa90ec73a34f0855aa986c0e18dd17b250fdd0f72eb8a2bd472aa002989074657
 
 ### DataCompiler.sol
-20 gwei
-0.03490544 ETH
-https://etherscan.io/tx/0xcbb0d7f7f7647318435e6aa08912318804352da122300461ad6ff88dc3d6922c
+* 20 gwei
+* 0.03490544 ETH
+* https://etherscan.io/tx/0xcbb0d7f7f7647318435e6aa08912318804352da122300461ad6ff88dc3d6922c
 
 ## External Contracts
 
