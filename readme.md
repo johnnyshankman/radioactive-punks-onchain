@@ -1,6 +1,6 @@
 # Radioactive Punks On-Chain
 
-Getting sludgy on-chain.
+The punks that survived the cryptopocalypse, let's get sludgy on-chain.
 
 <img width="504" alt="RPUNKS" src="https://i.seadn.io/gae/HeTVDgjX_Q_LB7OYL-rWnKWFggBcLurUoiOidQXzYhsc1RggxbNW3lzqy3saxrUL0A_14F8iBG8GYeC-U43Hb59Bl908VjxZYPO2?auto=format&dpr=1&w=1920">
 
