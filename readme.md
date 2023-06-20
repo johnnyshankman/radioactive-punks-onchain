@@ -4,7 +4,7 @@ Getting sludgy on-chain.
 
 <img width="504" alt="Screen Shot 2023-06-19 at 5 42 20 PM" src="https://github.com/johnnyshankman/radioactive-punks-onchain/assets/6632701/8f080d3c-a998-4507-93fd-eeba276bd14b">
 
-![image](https://github.com/johnnyshankman/radioactive-punks-onchain/assets/6632701/b02df77f-b4f9-445b-b1e0-ec3b90a6268c)
+![image](https://github.com/johnnyshankman/radioactive-punks-onchain/assets/6632701/b02df77f-b4f9-445b-b1e0-ec3b90a6268c.gif)
 
 ## Where To Find It?
 
