@@ -109,7 +109,7 @@ Goerli
 This would not have been possible if I was not standing upon the shoulders of these giants:
 * [CryptoadzChained by Wattysart](https://github.com/wattsyart/cryptoadz-chained)
 * [Roses by Dom.eth](https://etherscan.io/address/0x3e743377417cd7ca70dcc9bf08fac55664ed3181)
-* [Cryptocoaster 3D by Xtremetom](https://opensea.io/collection/crypto-coaster-3d)
+* [Crypto Coaster by Xtremetom](https://opensea.io/collection/crypto-coaster-3d)
 * [Forgotten Runes Wizard Cult On Chain Migration](https://www.forgottenrunes.com/posts/on-chain)
 
 Please support their projects, art, and personal social media accounts.
