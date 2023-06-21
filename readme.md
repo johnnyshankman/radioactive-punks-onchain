@@ -121,6 +121,13 @@ Goerli
 
 <img width="504" alt="Screen Shot 2023-06-19 at 5 42 20 PM" src="https://github.com/johnnyshankman/radioactive-punks-onchain/assets/6632701/8f080d3c-a998-4507-93fd-eeba276bd14b">
 
+## Getting this Data from an RPC
+
+Here's an example of getting the data of Punk #0 from the Cloudflare Public Ethereum RPC:
+```
+curl -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0", "id":1, "method":"eth_call", "params":[{"to":"0x5694010444cC8fbbed96c23a65FbC3714F624A26", "data":"0xc87b56dd0000000000000000000000000000000000000000000000000000000000000000"},"latest"]}' https://cloudflare-eth.com/
+```
+
 ## Improvements and Oversights
 
 1. Had I reordered the BytesHyperstructure to use the same indexing as the original NFT contract, I could've avoided the need for the entire `TOKEN_ID_TO_BYTES_LOOKUP` data structure, saving quite a lot of gas on deployment.
