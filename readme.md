@@ -128,6 +128,9 @@ Here's an example of getting the data of Punk #0 from the Cloudflare Public Ethe
 curl -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0", "id":1, "method":"eth_call", "params":[{"to":"0x5694010444cC8fbbed96c23a65FbC3714F624A26", "data":"0xc87b56dd0000000000000000000000000000000000000000000000000000000000000000"},"latest"]}' https://cloudflare-eth.com/
 ```
 
+Want to create an API that serves a chained punk or your own similar on chain `ITokenURISupplier` contract? Deploy a TokenURI Proxy Server using a free Heroku node and Public RPC Node!
+* https://github.com/johnnyshankman/tokenuri-proxy-server
+
 ## Improvements and Oversights
 
 1. Had I reordered the BytesHyperstructure to use the same indexing as the original NFT contract, I could've avoided the need for the entire `TOKEN_ID_TO_BYTES_LOOKUP` data structure, saving quite a lot of gas on deployment.
