@@ -1,0 +1,1415 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for contracts/DataCompiler.sol</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">all files</a> / <a href="index.html">contracts/</a> DataCompiler.sol
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">92.86% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>52/56</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">85.71% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>24/28</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">93.33% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>14/15</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">93.02% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>80/86</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1615×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1615×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3230×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8072×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8074×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-yes">3234×</span>
+<span class="cline-any cline-yes">3234×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">135618×</span>
+<span class="cline-any cline-yes">135618×</span>
+<span class="cline-any cline-yes">135618×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">135618×</span>
+<span class="cline-any cline-yes">10308590×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10308590×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7790061×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2518529×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">135618×</span>
+<span class="cline-any cline-yes">135618×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">135618×</span>
+<span class="cline-any cline-yes">10308590×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10308590×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7790061×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2518529×</span>
+<span class="cline-any cline-yes">2518529×</span>
+<span class="cline-any cline-yes">2518529×</span>
+<span class="cline-any cline-yes">2518529×</span>
+<span class="cline-any cline-yes">2518529×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">135618×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">31×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1618×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1615×</span>
+<span class="cline-any cline-yes">1615×</span>
+<span class="cline-any cline-yes">1615×</span>
+<span class="cline-any cline-yes">5883×</span>
+<span class="cline-any cline-yes">5883×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1615×</span>
+<span class="cline-any cline-yes">1615×</span>
+<span class="cline-any cline-yes">1615×</span>
+<span class="cline-any cline-yes">5883×</span>
+<span class="cline-any cline-yes">5883×</span>
+<span class="cline-any cline-yes">5883×</span>
+<span class="cline-any cline-yes">5883×</span>
+<span class="cline-any cline-yes">5883×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1615×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1615×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1617×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// SPDX-License-Identifier: Unlicense
+// @author: whitelights.eth
+&nbsp;
+pragma solidity ^0.8.20;
+&nbsp;
+///////////////////////////////////////////////////////////////////////////////////////
+//                                                                                   //
+//                                                                                   //
+//                                        ╓                                          //
+//                             └⌐        ▓▌  ,▓¬        ,▄▓                          //
+//                ²▄,        ╫⌐ ▓ ▌    ╒J▓⌐ ▓▓¬    ╓▄▄▓▓▓▓▀         ,▄▄▓▀            //
+//                 ▐▓▌ ▓     ▓▄▓▓ ▓⌐   j▓▓ ▓▓▌ ▄▓▓▓▓▓▓▓▀▐▄▌▓▓▓▓▓▓▓▓▓▓▓▓              //
+//                 ▐▓▓ ▓    ▓▓▓▓▓ ▓▓   ▓▓▓ ▓▓▌▐▓▀▀▀▓▓▓ ▐▓▓▓▓▓█▀▀╙¬¬└▀▓               //
+//                 ▓▓▓▓▓   ▓▓▓▓▓ ▐▓▓  ▐▓▓▌ ▓▓▌▐▌   j▓▓ ▓▓▓▓▀                         //
+//                ▐▓▓▓▓▓   ▓▓▓▓▓ ▓▓▓  ▐▓▓▓ ▓▓▌     ]▓▓ ▓▓▓▌    ▄▄                    //
+//                 ▓▓▓▓▓  ▄▓▓▓▓▓ ╫▓▓▓▓▓▓▓▌ ▓▓▌     ▓▓▓ ▐▓▓µ ,▓▓▓                     //
+//                  ▓▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▀▓▓▓▌ ▓▓▌    ▄▓▓▓ ▐▓▓▓▓█▀▀Γ                     //
+//                  ▀▓▓▓▓▓▓▓▓▓▓  ▓▓▓▄ ▐▓▓▌ ▓▓▌   ▀▓▓▓▌ ╫▓▓▀                          //
+//                   ▓▓▓▓▓▓▓█▓▓  ▀▓▓b ▐▓▓▓ ▓▓▌    ▓▓▓  ▓▓▓       ╓▌                  //
+//                   ▐▓▓▌╙¬¬ j▓▌  ▓▓   ▓▓▓ ▓▓▄   ▐▓▓  ▐▓▓▓   ▓▓▓▓▓                   //
+//                  ,▓▓█`   ,▓█` ▄▓▀  ▄▓▓▀▄▓▀   ╓▓█¬ ▄▓▓▓▀ ,▓▓▓▓▓▀                   //
+//                 ▓▓▓     ▓▓  ▄▓╙  ▄▓▓`▄▓▀   ╒▓▓  ╓▓▓▓▀  ▓▓▓▓▓▀                     //
+//                 ▀▓▓▄    ▀▓▄ ╙▓▄  ╙█▓▄╙▓▓µ   ▀▓▄  ▀▓▓▌⌐ ▀▓▓▓▓▌                     //
+//                  ▐▓█▌    ▀▓  ▐▓    ▓▓ ╫▓▀   ▐▓¬  ▐▓▓▓▓▓▓▓▓▓▓▓                     //
+//                   ▓ ▀     ▀  ▐     ▀▌ ▓▌    ▓¬   ▀▀¬ ▐▓▓▓█▀▀                      //
+//                   ▓                ▐▓ ▓⌐   ▐▓         ▓\                          //
+//                   ▐                 ▓ ▓    ▐¬        '▌                           //
+//                                   ▓∩.         ]▄                                  //
+//       ▓µ             ╓▌         ▄▓▓▓ ▓       ▄▐▓              ╓▄Æ            µ    //
+//       ▓▓▓           ▓▓       ,▄▓▓▓▓▓ ▓▓     ▄▓▓▌  ,▄▄▄▄▄▄▄▓▓▓▓▓▓         ,▄▓▓     //
+//     ▄▓▓▓▓▄          ▓▓    ▄▓▓▓▓▓▓▓▓  ▓▓▌    ▓▓▓ ]▓▓▓███▓▓▓▓▓█▓▓▓ ▄▓▓▓▓▓▓▓▓▓▓      //
+//     █▀▓▓▓           ▓▓µ  ▓▓▓▓▀▀╙¬   ▐▓▓▓    ▓▓▓ ▓▓█    ▐▓▓▓  ▓▓ ▓▓▓▓▓█▀▀▀▀`       //
+//      ╓▓▓▓           ▓▓▌ ▓▓▓▀     ▄▓⌐j▓▓▓▄▄╓▄▓▓▌ ▓      ▓▓▓b  ` ▐▓▓▓▓,             //
+//     ▄▓▓▓▓          ]▓▓▌ ▓▓▓   ▓▓▓▓▓µ ▓▓▓▓▓▓▓▓▓▌       .▓▓▓    , ▀▓▓▓▓▓▓▄,         //
+//    ╚`  ▓▓▌       ╫▄▐▓▓ ╫▓▓▓▌     ▓▓▌ ▓▓▓█▀╙▀▓▓▓       j▓▓▓    ▐▓   ▀▀▓▓▓▓▓▄       //
+//       j▓▓▌       ▓▌.▓▓ ▐▓▓▓▓▓   ▐▓▓▓ ▐▓▓    ╫▓▓        ▓▓▌    ▐▓▓     ▓▓▓▓▓       //
+//        ▓▓▓       ▓▓ ▓▓ ▐▓▓▓▓▓µ  └▓▓▓ ▐▓▓    ▐▓▓µ       ▓▓▓    ▐▓▓     ▓▓▓▓▓       //
+//       ▓▓▓╙      ▄▓,▓▓▀,▓▓▓▓▓█   ▓▓▓▀,▓▓▀   ,▓▓█       ▄▓▓"   ,▓▓▀    ╓▓▓▓▓▀       //
+//     ▄▓▓▀      ╓▓▀▄▓▀,▓▓▓▓▓█¬  ▄▓▓▀.▓▓▀    ▓▓█¬      ▄▓▓▀    ▓▓▀    ,▓▓▓▓▀         //
+//     ╙▀▓▓▄     ╙╙▀▓▀█▌▀▀▓▓▓▓▄ç ▀▀▓▓▄▀▀▓▄  ¬▀▀▓▄µ     ╙▀▓▓▄  ¬▀▀▓▄   ╙▀█▓▓▓▄        //
+//       ▐▓▓▄     ▄▓▓b▐▓▌ ▐▓▓▓▓▓▓▓▓▓▓▓▌ ▓▓▌    ▓▓▓       j▓▓∩   ,▓▓▓▓     ▓▓▓▌       //
+//       └▓▓▓▓▓▓▓▓▓█▀ ▐▓▌   █▓▓▓▓▓▓▓▓▓▌ ▓▓▓    ▓▓▓        ▓▓⌐    └▀▓▓▓▓▓▓▓▓▓▓        //
+//        ▓▓▓▓█▀▀¬    j▓▌      ¬    ▓▓▓ ▓▓▓    ▀▓▓        ▓▓        ╙▓▓▓▓▓▓¬         //
+//        ▓▓▀          ▓▌           ▓▓▀ ╫▓▓     ▓▌       j▓▌          ▓▓▓█▀          //
+//       .▓            ▓            ▓   ╫▓      ▓▌       ▓▀           ╫▓             //
+//       Å             ▀            ▓   ▓       ▓       ▓▀            ▓¬             //
+//                                              ▌      ▐▀                            //
+//                                                                                   //
+//                                                                                   //
+//                                                                                   //
+///////////////////////////////////////////////////////////////////////////////////////
+//
+// May this server your on-chain art needs well.
+//
+// A swiss army knife for compiling tokenUri data on the fly.
+// Thanks dom.eth for the inspiration.
+&nbsp;
+import './IBytesChunk.sol';
+import './IStringChunk.sol';
+import './IDataCompiler.sol';
+&nbsp;
+contract DataCompiler is IDataCompiler {
+  address public immutable owner;
+&nbsp;
+  /**
+   * @dev The addresses of the fflate chunks. These chunks when put together
+   * create a valid data:text/javascript;base64, script that is the fflate
+   * library production code, which can then be used to inflate compressed data.
+   */
+  address[2] private fflateAddresses = [
+    address(0),
+    address(0)
+  ];
+&nbsp;
+  /**
+   * @notice These constants are pre-URI-encoded to save gas and time. Some
+   * are single encoded, some are double encoded. Just depends on where they
+   * end up in the final tokenUri.
+   */
+  string public constant BEGIN_JSON =
+    "data:application/json,%7B"; // data:application/json,{
+  string public constant END_JSON =
+    "%7D"; // }
+  string public constant BEGIN_SCRIPT =
+    "%253Cscript%253E"; // &lt;script&gt;
+  string public constant END_SCRIPT =
+    "%253C%252Fscript%253E"; // &lt;/script&gt;
+  string public constant BEGIN_SCRIPT_DATA_COMPRESSED =
+    "%253Cscript%253Econst%2520b%253DUint8Array.from(atob(%2522";
+  string public constant END_SCRIPT_DATA_COMPRESSED =
+    "%2522)%252Ce%253D%253Ee.charCodeAt(0))%253B";
+  string public constant HTML_HEAD_END =
+    "%253C%252Fhead%253E%253Cbody%253E"; // &lt;/head&gt;&lt;body&gt;
+&nbsp;
+  /**
+   * @notice These should be combined with BEGIN_SCRIPT_DATA_COMPRESSED
+   * and END_SCRIPT_DATA_COMPRESSED. They are double URI encoded.
+   */
+  string public constant END_SCRIPT_JS_DATA_COMPRESSED =
+    "var%2520ugz%253Dfflate.gunzipSync(b)%252Ct%253Dfflate.strFromU8(ugz)%252Cs%253Ddocument.createElement(%2522script%2522)%253Bs.type%253D%2522text%252Fjavascript%2522%252Cs.text%253Dt%252Cdocument.head.appendChild(s)%253B%253C%252Fscript%253E";
+  string public constant END_SCRIPT_SVG_DATA_COMPRESSED =
+    "var%2520ugz%253Dfflate.gunzipSync(b)%252Ct%253Dfflate.strFromU8(ugz)%253Bconst%2520c%253Ddocument.createElementNS(%2522http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2522%252C%2522svg%2522)%253Bc.setAttribute(%2522class%2522%252C%2522c%2522)%253Bvar%2520s%253Ddocument.createElementNS(%2522http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2522%252C%2522svg%2522)%253Bs.setAttribute(%2522width%2522%252C%25220%2522)%252Cs.setAttribute(%2522height%2522%252C%25220%2522)%252Cs.classList.add(%2522hidden%2522)%252Cs.innerHTML%253Dt%252Cc.appendChild(s)%252Cdocument.body.appendChild(c)%253B%253C%252Fscript%253E";
+&nbsp;
+  constructor(address chunk1, address chunk2) {
+    owner = msg.sender;
+    // 0x86A477028841854D9d02a5BD4fd6936216510A0f, // goerli
+    // 0xB948057bdd71835b19Ff90aEa03FAd3Ebb66E870 // goerli
+    // 0xa942F946A35545F50792DA1Ea1ADf0c3b619b921, // mainnet
+    // 0xF10EeDb5ACE715d78e0f89eCd1Dfc3E5874f6e3c // mainnet
+    fflateAddresses[0] = chunk1;
+    fflateAddresses[1] = chunk2;
+  }
+&nbsp;
+  /**
+   * @dev FFlate script is the actual entire script as a URL so this
+   * returns the full `data:text/javascript:base64,blah"` URL
+   * no need to decompress, just set `src=`
+   */
+  function fflate() public view returns (string memory) {
+    address[] memory fflateChunks = new address[](2);
+    fflateChunks[0] = fflateAddresses[0];
+    fflateChunks[1] = fflateAddresses[1];
+    return compileDataChunks(fflateChunks);
+  }
+&nbsp;
+  /**
+   * @dev Returns a string which encodes the beginning of the HTML Data URI (data:text/html) and then
+   * inserts an fflate &lt;script&gt; inside of the opening &lt;head&gt;. It then closes the &lt;head&gt;, and opens
+   * the body of the HTML for you to concatenate and then cap off with HTML_FOOT().
+   * Why do this instead of opening the &lt;head&gt; and leaving that open? Because this way any &lt;script&gt;
+   * tag put into the DOM will have access to document.body, which is not available until the &lt;body&gt;
+   * tag is opened. Everything will have access to fflate.
+   */
+  function HTML_HEAD_START() public view returns (string memory) {
+    return
+      string(
+        abi.encodePacked(
+          // single URI encoded because it just shows up in the raw JSON URI
+          encodeURI("data:text/html,"),
+          // double encoded because its inside the animation URI (1x) which lies inside of the URI-encoded JSON object (2x)
+          encodeURI(
+            encodeURI(
+              '&lt;!doctype html&gt;&lt;html lang="en"&gt;&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;script src="'
+            )
+          ),
+          fflate(),
+          encodeURI(encodeURI('"&gt;&lt;/script&gt;'))
+        )
+      );
+  }
+&nbsp;
+  /**
+   * @dev Returns a double encoded string of the end HTML &lt;body&gt; and &lt;html&gt; tags
+   */
+  function HTML_FOOT() public pure returns (string memory) {
+    return encodeURI(encodeURI("&lt;/body&gt;&lt;/html&gt;"));
+  }
+&nbsp;
+  function SCRIPT_VAR(
+    string memory name,
+    string memory value,
+    bool omitQuotes
+  ) public pure returns (string memory) {
+    return
+      string(
+        abi.encodePacked(
+          encodeURI(encodeURI('var ')),
+          encodeURI(encodeURI(name)),
+          encodeURI(encodeURI("=")),
+          encodeURI(encodeURI(omitQuotes ? "" : '"')),
+          encodeURI(encodeURI(value)),
+          encodeURI(encodeURI(omitQuotes ? ";" : '";'))
+        )
+      );
+  }
+&nbsp;
+  function BEGIN_METADATA_VAR(
+    string memory name,
+    bool omitQuotes
+  ) public pure returns (string memory) {
+    return
+      string(
+        abi.encodePacked(
+          encodeURI('"'),
+          encodeURI(name),
+          encodeURI(omitQuotes ? '":' : '":"')
+        )
+      );
+  }
+&nbsp;
+  function END_METADATA_VAR(
+    bool omitQuotes,
+    bool last
+  ) public pure returns (string memory) {
+    return encodeURI(omitQuotes ? last ? "" : "," : last ? '"' : '",');
+  }
+&nbsp;
+  /**
+   * @dev Compile an array of addresses leading to IStringChunk contracts.
+   * Returns a string concatenating all of data into a giant string.
+   */
+  function compileDataChunks(address[] memory chunks) public pure returns (string memory) {
+    string memory result = "";
+    for (uint256 i; i &lt; chunks.length; i++) {
+      IStringChunk data = IStringChunk(chunks[i]);
+      result = string(abi.encodePacked(result, data.data()));
+    }
+&nbsp;
+    return result;
+  }
+&nbsp;
+  /**
+   * @dev Compile an array of addresses leading to IBytesChunk contracts.
+   * Returns bytes with all of data concatenated together in order.
+   */
+<span class="fstat-no" title="function not covered" >  function compileBytesChunks(address[] memory chunks) public pure returns (bytes memory) {</span>
+<span class="cstat-no" title="statement not covered" >    bytes memory result = "";</span>
+<span class="cstat-no" title="statement not covered" >    for (uint256 i; i &lt; chunks.length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >      IBytesChunk data = IBytesChunk(chunks[i]);</span>
+      result = abi.encodePacked(result, data.data());
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return result;</span>
+  }
+&nbsp;
+  /**
+   * @dev URI Encoding/Decoding Hex Table
+   */
+  bytes internal constant TABLE = "0123456789ABCDEF";
+&nbsp;
+  /**
+   * @dev URI encodes the provided string. Gas optimized like crazy.
+   */
+  function encodeURI(string memory str) public pure returns (string memory) {
+      bytes memory input = bytes(str);
+      uint256 inputLength = input.length;
+      uint256 outputLength = 0;
+&nbsp;
+      for (uint256 i = 0; i &lt; inputLength; i++) {
+          bytes1 b = input[i];
+&nbsp;
+          if (
+              (b &gt;= 0x30 &amp;&amp; b &lt;= 0x39) ||
+              (b &gt;= 0x41 &amp;&amp; b &lt;= 0x5a) ||
+              (b &gt;= 0x61 &amp;&amp; b &lt;= 0x7a)
+          ) {
+              outputLength++;
+          } else {
+              outputLength += 3;
+          }
+      }
+&nbsp;
+      bytes memory output = new bytes(outputLength);
+      uint256 j = 0;
+&nbsp;
+      for (uint256 i = 0; i &lt; inputLength; i++) {
+          bytes1 b = input[i];
+&nbsp;
+          if (
+              (b &gt;= 0x30 &amp;&amp; b &lt;= 0x39) ||
+              (b &gt;= 0x41 &amp;&amp; b &lt;= 0x5a) ||
+              (b &gt;= 0x61 &amp;&amp; b &lt;= 0x7a)
+          ) {
+              output[j++] = b;
+          } else {
+              bytes1 b1 = TABLE[uint8(b) / 16];
+              bytes1 b2 = TABLE[uint8(b) % 16];
+              output[j++] = 0x25; // '%'
+              output[j++] = b1;
+              output[j++] = b2;
+          }
+      }
+&nbsp;
+      return string(output);
+  }
+&nbsp;
+  /**
+   * @dev URI decodes the provided string. Strings which are incorrectly
+   *      encoded and cannot be parsed will usually revert. It expects
+   *      that all URI encoded characters use capitals (ex: &lt; is %3E not %3e)
+   */
+  function decodeURI(string memory str) public pure returns (string memory) {
+    string memory result = "";
+    uint256 bytelength = bytes(str).length;
+&nbsp;
+    for (uint256 i = 0; i &lt; bytelength; i++) {
+      bytes1 b = bytes(str)[i];
+      // check if that character (as a byte1) is the "%" sign delimiter
+      if (b == bytes1("%")) {
+        // parse the two characters following the % delimiter
+        uint8 byteU8_1 = uint8(bytes(str)[++i]);
+        uint8 byteU8_2 = uint8(bytes(str)[++i]);
+&nbsp;
+        // ensure they are characters 0-9 or A-F and therefore hexidecimal
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(
+          ((byteU8_1 &gt;= 48 &amp;&amp; byteU8_1 &lt;= 57) ||
+<span class="branch-1 cbranch-no" title="branch not covered" >              (byteU8_1 &gt;= 65 &amp;&amp; byteU8_1 &lt;= 70)</span>),
+          "invalid encoded string"
+        );
+        <span class="missing-if-branch" title="else path not taken" >E</span>require(
+          ((byteU8_2 &gt;= 48 &amp;&amp; byteU8_2 &lt;= 57) ||
+              (byteU8_2 &gt;= 65 &amp;&amp; byteU8_2 &lt;= 70)),
+          "invalid encoded string"
+        );
+&nbsp;
+        // convert the 1st char representing a hexidecimal to decimal (ex: A = 10)
+        uint8 hexCharAsDecimal;
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (byteU8_1 &gt;= 48 &amp;&amp; byteU8_1 &lt;= 57) {
+          // 0-9
+          hexCharAsDecimal = byteU8_1 - 48;
+        } else {
+          // A-F
+          hexCharAsDecimal = byteU8_1 - 55;
+        }
+&nbsp;
+        // convert the 2nd char representing a hexidecimal to decimal (ex: F = 15)
+        uint8 hexCharAsDecimal2;
+        if (byteU8_2 &gt;= 48 &amp;&amp; byteU8_2 &lt;= 57) {
+          // 0-9
+          hexCharAsDecimal2 = byteU8_2 - 48;
+        } else {
+          // A-F
+          hexCharAsDecimal2 = byteU8_2 - 55;
+        }
+&nbsp;
+        // 1st hex-char is a number words to move over
+        // 2nd hex-char is byte offset from there
+        // ex: %3E we move (3 * 16) + 14 bytes over
+        result = string(
+          abi.encodePacked(
+            result,
+            bytes1((hexCharAsDecimal * 16) + hexCharAsDecimal2)
+          )
+        );
+      } else {
+        result = string(
+          abi.encodePacked(result, string(abi.encodePacked(b)))
+        );
+      }
+    }
+&nbsp;
+    return result;
+  }
+&nbsp;
+  /**
+   * @dev Converts any uint256 into its string representation
+   */
+  function uint2str(uint256 _i) public pure returns (string memory _uintAsString) {
+    if (_i == 0) {
+      return "0";
+    }
+    uint256 j = _i;
+    uint256 len;
+    while (j != 0) {
+      len++;
+      j /= 10;
+    }
+    bytes memory bstr = new bytes(len);
+    uint256 k = len;
+    while (_i != 0) {
+      k = k - 1;
+      uint8 temp = (48 + uint8(_i - (_i / 10) * 10));
+      bytes1 b1 = bytes1(temp);
+      bstr[k] = b1;
+      _i /= 10;
+    }
+    return string(bstr);
+  }
+&nbsp;
+  // function uint2str(uint256 value) public pure returns (string memory str) {
+  //   /// @solidity memory-safe-assembly
+  //   assembly {
+  //     // The maximum value of a uint256 contains 78 digits (1 byte per digit), but we allocate 160 bytes
+  //     // to keep the free memory pointer word aligned. We'll need 1 word for the length, 1 word for the
+  //     // trailing zeros padding, and 3 other words for a max of 78 digits. In total: 5 * 32 = 160 bytes.
+  //     let newFreeMemoryPointer := add(mload(0x40), 160)
+&nbsp;
+  //     // Update the free memory pointer to avoid overriding our string.
+  //     mstore(0x40, newFreeMemoryPointer)
+&nbsp;
+  //     // Assign str to the end of the zone of newly allocated memory.
+  //     str := sub(newFreeMemoryPointer, 32)
+&nbsp;
+  //     // Clean the last word of memory it may not be overwritten.
+  //     mstore(str, 0)
+&nbsp;
+  //     // Cache the end of the memory to calculate the length later.
+  //     let end := str
+&nbsp;
+  //     // We write the string from rightmost digit to leftmost digit.
+  //     // The following is essentially a do-while loop that also handles the zero case.
+  //     // prettier-ignore
+  //     for { let temp := value } 1 {} {
+  //       // Move the pointer 1 byte to the left.
+  //       str := sub(str, 1)
+&nbsp;
+  //       // Write the character to the pointer.
+  //       // The ASCII index of the '0' character is 48.
+  //       mstore8(str, add(48, mod(temp, 10)))
+&nbsp;
+  //       // Keep dividing temp until zero.
+  //       temp := div(temp, 10)
+&nbsp;
+  //       // prettier-ignore
+  //       if iszero(temp) { break }
+  //     }
+&nbsp;
+  //     // Compute and cache the final total length of the string.
+  //     let length := sub(end, str)
+&nbsp;
+  //     // Move the pointer 32 bytes leftwards to make room for the length.
+  //     str := sub(str, 32)
+&nbsp;
+  //     // Store the string's length at the start of memory allocated for our string.
+  //     mstore(str, length)
+  //   }
+  // }
+&nbsp;
+&nbsp;
+  /**
+   * @dev Converts any bytes16 into its string representation
+   */
+  function toHex16String (bytes16 data) public pure returns (string memory) {
+    return string (abi.encodePacked (toHex16 (data)));
+  }
+&nbsp;
+  /**
+   * @dev Converts any bytes32 into its string representation
+   */
+  function toHex32String (bytes32 data) public pure returns (string memory) {
+    return string (abi.encodePacked (toHex16 (bytes16 (data)), toHex16 (bytes16 (data &lt;&lt; 128))));
+  }
+&nbsp;
+  function toHex16 (bytes16 data) internal pure returns (bytes32 result) {
+    result = bytes32 (data) &amp; 0xFFFFFFFFFFFFFFFF000000000000000000000000000000000000000000000000 |
+      (bytes32 (data) &amp; 0x0000000000000000FFFFFFFFFFFFFFFF00000000000000000000000000000000) &gt;&gt; 64;
+    result = result &amp; 0xFFFFFFFF000000000000000000000000FFFFFFFF000000000000000000000000 |
+      (result &amp; 0x00000000FFFFFFFF000000000000000000000000FFFFFFFF0000000000000000) &gt;&gt; 32;
+    result = result &amp; 0xFFFF000000000000FFFF000000000000FFFF000000000000FFFF000000000000 |
+      (result &amp; 0x0000FFFF000000000000FFFF000000000000FFFF000000000000FFFF00000000) &gt;&gt; 16;
+    result = result &amp; 0xFF000000FF000000FF000000FF000000FF000000FF000000FF000000FF000000 |
+      (result &amp; 0x00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000) &gt;&gt; 8;
+    result = (result &amp; 0xF000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000) &gt;&gt; 4 |
+      (result &amp; 0x0F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F00) &gt;&gt; 8;
+    result = bytes32 (0x3030303030303030303030303030303030303030303030303030303030303030 +
+      uint256 (result) +
+      (uint256 (result) + 0x0606060606060606060606060606060606060606060606060606060606060606 &gt;&gt; 4 &amp;
+      0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F) * 7);
+  }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Jun 20 2023 19:31:14 GMT-0400 (Eastern Daylight Time)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>
