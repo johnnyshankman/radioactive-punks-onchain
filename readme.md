@@ -4,11 +4,11 @@ The punks that survived the cryptopocalypse, now on-chain.
 
 <img width="504" alt="RPUNKS" src="https://i.seadn.io/gae/HeTVDgjX_Q_LB7OYL-rWnKWFggBcLurUoiOidQXzYhsc1RggxbNW3lzqy3saxrUL0A_14F8iBG8GYeC-U43Hb59Bl908VjxZYPO2?auto=format&dpr=1&w=1920">
 
-## Where To Find It?
+## Where To Find Them
 
-The contracts are [live on Mainnet](https://etherscan.io/address/0x5694010444cc8fbbed96c23a65fbc3714f624a26#code).
+The contracts are [live on Mainnet](https://etherscan.io/address/0x5694010444cc8fbbed96c23a65fbc3714f624a26#code) and can be played with on Etherscan.
 
-Use the [Radioactive Punks Operating System Website](https://radioactivepunks.xyz) to view any punk's image and attributes stored on-chain with PUNK LOOKUP app.
+You may use the [Radioactive Punks Operating System Website](https://radioactivepunks.xyz) to view any punk's image and attributes stored on-chain with our PUNK LOOKUP dApp.
 
 ![Screen Shot 2023-06-20 at 5 19 10 PM](https://github.com/johnnyshankman/radioactive-punks-onchain/assets/6632701/290d5d91-b502-45a4-85a1-262eb5cc5853)
 
