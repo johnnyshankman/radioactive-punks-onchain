@@ -4,19 +4,6 @@ The punks that survived the cryptopocalypse, now on-chain.
 
 <img width="504" alt="RPUNKS" src="https://i.seadn.io/gae/HeTVDgjX_Q_LB7OYL-rWnKWFggBcLurUoiOidQXzYhsc1RggxbNW3lzqy3saxrUL0A_14F8iBG8GYeC-U43Hb59Bl908VjxZYPO2?auto=format&dpr=1&w=1920">
 
-## Shoutouts
-
-This would not have been possible if I was not standing upon the shoulders of these giants:
-* [CryptoadzChained by Wattysart](https://github.com/wattsyart/cryptoadz-chained)
-* [Roses by Dom.eth](https://etherscan.io/address/0x3e743377417cd7ca70dcc9bf08fac55664ed3181)
-* [Crypto Coaster by Xtremetom](https://opensea.io/collection/crypto-coaster-3d)
-* [Forgotten Runes Wizard Cult On Chain Migration](https://www.forgottenrunes.com/posts/on-chain)
-* [Chaos Roads by Chain Leftist](https://twitter.com/ChainLeftist)
-* [JPEG On Chain Curation](https://jpg.space/canons/onchain/pending)
-* [Why on chain? by 0xmons](https://blog.0xmons.xyz/79081566310)
-
-Please support their projects, art, and personal social media accounts.
-
 ## Where To Find It?
 
 The contracts are [live on Mainnet](https://etherscan.io/address/0x5694010444cc8fbbed96c23a65fbc3714f624a26#code).
@@ -137,3 +124,16 @@ Want to create an API that serves a chained punk or your own similar on chain `I
 2. I probably could've used SSTORE2 for a few minor strings to save minor amounts of gas upon deployment of the `RadioactivePunksRenderer.sol` file.
 3. Maybe use [EIP-681](https://eips.ethereum.org/EIPS/eip-681) or [EIP-4804](
 https://eips.ethereum.org/EIPS/eip-4804) on the original NFT contract's `tokenURI` though the contract haphazardly appends `.json` at the end of every returned URI so that may never be a feasible thing for us.
+
+## Shoutouts
+
+This would not have been possible if I was not standing upon the shoulders of these giants:
+* [CryptoadzChained by Wattysart](https://github.com/wattsyart/cryptoadz-chained)
+* [Roses by Dom.eth](https://etherscan.io/address/0x3e743377417cd7ca70dcc9bf08fac55664ed3181)
+* [Crypto Coaster by Xtremetom](https://opensea.io/collection/crypto-coaster-3d)
+* [Forgotten Runes Wizard Cult On Chain Migration](https://www.forgottenrunes.com/posts/on-chain)
+* [Chaos Roads by Chain Leftist](https://twitter.com/ChainLeftist)
+* [JPEG On Chain Curation](https://jpg.space/canons/onchain/pending)
+* [Why on chain? by 0xmons](https://blog.0xmons.xyz/79081566310)
+
+Please support their projects, art, and personal social media accounts.
