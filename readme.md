@@ -67,7 +67,7 @@ If you'd like to download your punk, right clicking anywhere on the page will tr
 
 ## What was the deployment cost?
 
-Approximately `0.44560054 Ether` for all contracts combined.
+Approximately `0.44560054 Ether` for all originalcontracts combined.
 
 ## Contracts Deployed
 
@@ -77,9 +77,11 @@ Approximately `0.44560054 Ether` for all contracts combined.
 * https://etherscan.io/tx/0xea7806d3943a14c162dc35ad3c720574f3e937934721f096fa7b9f21c722e669
 
 ### RadioactivePunksRendererV2.sol
+* New wrapper to fix minor rendering bug
 * https://etherscan.io/tx/0x7a4b7f2813ab4419364934a3de9d1a268e900d6cfb0ed655bfa494a1b9158127
 
 ### RadioactivePunksJSON.sol
+* New wrapper to support ERC-4804 tokenJSON
 * https://etherscan.io/tx/0x029115d9da775889ad2d2168aef674ebe04f5f08eaeb8d4109e7c4ec1afff894
 
 ### RadioactivePunksSVGChunk1.sol
