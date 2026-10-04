@@ -45,7 +45,9 @@ This is not an ERC-721 token, it is a `ITokenURISupplier` and therefore contains
 
 Deployment is modular and split across five main components:
 
-`RadioactivePunksRenderer`: responsible producing an on-chain `tokenURI`
+`RadioactivePunksRendererV2`: responsible producing JSON Data URL
+
+`RadioactivePunksJSON`: responsible for producing ERC-4804 compliant NFT tokenJSON() (to use as response of web3:// URLs)
 
 `RadioactivePunksBytesHyperstructure`: the encoded trait data of every punk as bytes in groups of 15
 
@@ -55,7 +57,7 @@ Deployment is modular and split across five main components:
 
 `DataCompiler`: helpful functions for concatenating data into valid Data URI formats
 
-Why no use of "SSTORE2" you may ask? Well once you fill up the entire contract with bytes or string data there is no efficiency to be gained by using SSTORE2, it actually reuquires more overhead.
+Why no use of "SSTORE2" you may ask? Well once you fill up the entire contract with bytes or string data there is no efficiency to be gained by using SSTORE2, it actually requires more overhead.
 
 ## How does the punk render?
 
@@ -73,6 +75,12 @@ Approximately `0.44560054 Ether` for all contracts combined.
 * 13 gwei
 * 0.16157843 ETH
 * https://etherscan.io/tx/0xea7806d3943a14c162dc35ad3c720574f3e937934721f096fa7b9f21c722e669
+
+### RadioactivePunksRendererV2.sol
+* https://etherscan.io/tx/0x7a4b7f2813ab4419364934a3de9d1a268e900d6cfb0ed655bfa494a1b9158127
+
+### RadioactivePunksJSON.sol
+* https://etherscan.io/tx/0x029115d9da775889ad2d2168aef674ebe04f5f08eaeb8d4109e7c4ec1afff894
 
 ### RadioactivePunksSVGChunk1.sol
 * 19.27 gwei

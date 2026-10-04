@@ -17,7 +17,7 @@ pragma solidity ^0.8.31;
  *      e.g. web3://<this address>/tokenJSON/0
  */
 contract RadioactivePunksJSON {
-  address public constant RENDERER = 0x5694010444cC8fbbed96c23a65FbC3714F624A26;
+  address public constant RENDERER = 0x3d687421fefb01e69b9aeEc9EA3706D13A7C135F;
 
   // length of "data:application/json,"
   uint256 private constant PREFIX_LENGTH = 22;
