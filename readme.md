@@ -67,7 +67,7 @@ If you'd like to download your punk, right clicking anywhere on the page will tr
 
 ## What was the deployment cost?
 
-Approximately `0.44560054 Ether` for all originalcontracts combined.
+Approximately `0.44560054 Ether` for all original contracts combined.
 
 ## Contracts Deployed
 
