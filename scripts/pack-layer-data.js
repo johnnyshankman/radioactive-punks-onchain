@@ -42,7 +42,14 @@ function readTokenOrder() {
   return src.match(/uint16\[1614\] private TOKEN_ID_TO_BYTES_LOOKUP = \[([^\]]*)\]/)[1].match(/\d+/g).map(Number);
 }
 
-// id -> Map("x,y" -> "rrggbb"); later paths win, attributes in any order
+// The original art's background color. The one-of-one layers paint it as a
+// full-canvas rectangle; RadioactivePunksImage draws its own background, so
+// that rectangle is skipped.
+const ART_BACKGROUND = '1f2e3d';
+
+// id -> Map("x,y" -> "rrggbb"); later paths win, attributes in any order.
+// Every closed subpath in the art is an axis-aligned rectangle (1x1 pixels,
+// plus the one-of-ones' 24x24 background); each one fills the cells it covers.
 function parseLayers(svg) {
   const layers = {};
   const tok = /([MmHhVvZz])|(-?\d+(?:\.\d+)?)/g;
@@ -54,19 +61,34 @@ function parseLayers(svg) {
       let hex = fill.slice(1).toLowerCase();
       if (hex.length === 3) hex = hex.split('').map((c) => c + c).join('');
       if (!/^[0-9a-f]{6}$/.test(hex)) throw new Error(`unsupported fill ${fill} in ${id}`);
+
+      const fillRect = (points) => {
+        const xs = points.map((p) => p[0]);
+        const ys = points.map((p) => p[1]);
+        const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+        const isRect = points.length === 4
+          && points.every(([x, y]) => (x === x0 || x === x1) && (y === y0 || y === y1))
+          && new Set(points.map((p) => p.join())).size === 4;
+        if (!isRect) throw new Error(`non-rectangular subpath in ${id}: ${JSON.stringify(points)}`);
+        if (hex === ART_BACKGROUND && x0 === 0 && y0 === 0 && x1 === 24 && y1 === 24) return;
+        for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) px.set(`${x},${y}`, hex);
+      };
+
       const toks = [...d.matchAll(tok)].map((m) => m[1] || Number(m[2]));
-      let x = 0, y = 0, sx = 0, sy = 0, cmd = null;
+      let x = 0, y = 0, cmd = null, points = [];
       for (let i = 0; i < toks.length;) {
         if (typeof toks[i] === 'string') cmd = toks[i++];
-        if (cmd === 'Z' || cmd === 'z') { x = sx; y = sy; continue; }
-        if (cmd === 'M') { x = toks[i]; y = toks[i + 1]; i += 2; sx = x; sy = y; px.set(`${x},${y}`, hex); cmd = 'L'; }
-        else if (cmd === 'm') { x += toks[i]; y += toks[i + 1]; i += 2; sx = x; sy = y; px.set(`${x},${y}`, hex); cmd = 'l'; }
-        else if (cmd === 'h') x += toks[i++];
+        if (cmd === 'Z' || cmd === 'z') { fillRect(points); x = points[0][0]; y = points[0][1]; points = []; continue; }
+        if (cmd === 'M') { x = toks[i]; y = toks[i + 1]; i += 2; points = [[x, y]]; cmd = 'L'; continue; }
+        if (cmd === 'm') { x += toks[i]; y += toks[i + 1]; i += 2; points = [[x, y]]; cmd = 'l'; continue; }
+        if (cmd === 'h') x += toks[i++];
         else if (cmd === 'H') x = toks[i++];
         else if (cmd === 'v') y += toks[i++];
         else if (cmd === 'V') y = toks[i++];
         else throw new Error(`unexpected path token ${toks[i]} in ${id}`);
+        points.push([x, y]);
       }
+      if (points.length > 1) throw new Error(`unclosed subpath in ${id}`);
     }
     layers[id] = px;
   }

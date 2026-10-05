@@ -71,19 +71,25 @@ Apart from `animation_url` becoming `image`, the JSON is identical to `Radioacti
    - The 10 one-of-one tokens (698, 2536, 60, 370, 528, 246, 420, 201, 1360, 878) draw their own single image.
    - IDs with no art (e.g. `6-0`, "no beard") draw nothing, just like the original's `<use>` of a missing symbol.
 3. **Stack.** Each layer's color runs are painted into a 24×24 grid, later layers covering earlier ones.
-4. **Write SVG.** The grid becomes horizontal runs, with one `<path>` per color in order of first appearance, on a `#1f2e3d` background (the same as the Arweave images):
+4. **Write SVG.** The grid becomes horizontal runs, with one `<path>` per color in order of first appearance, on a `#473682` purple background:
 
 ```svg
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges"><rect width="24" height="24" fill="#1f2e3d"/><path fill="#7cff2f" d="M5 2h3v1h-3z..."/>...</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges"><rect width="24" height="24" fill="#473682"/><path fill="#7cff2f" d="M5 2h3v1h-3z..."/>...</svg>
 ```
 
 Output is 1.6 to 4.1 KB of SVG per punk (about 2.5 KB on average), roughly 2.5× smaller than the Arweave versions.
+
+### Background
+
+Every punk gets a `#473682` purple background. The original renderer and the Arweave images use `#1f2e3d` navy, so this is the one intentional change from the original art: every pixel that was background is now purple, and nothing else changes.
+
+The original art paints its background color in one place: each of the 10 one-of-ones starts with a full-canvas `#1f2e3d` rectangle (`M0 0h24v24H0z`). The packer skips exactly that rectangle, since the renderer draws its own background, so the one-of-ones get the purple background like every other punk. No other art uses `#1f2e3d`.
 
 Because the layers are flattened into a single grid, nothing overlaps. That also avoids the background seams that appear between stacked layers at fractional pixel sizes.
 
 ### Dead punks
 
-515 of the 1,614 punks are dead. They use the "simple rot" heads that the existing on-chain renderer uses (`img/dead-heads-simple`), so the image matches today's on-chain art exactly. The Arweave images use unique per-punk rot (`img/dead-heads`), so dead punks differ from Arweave in their rot texture. Alive punks match Arweave exactly.
+515 of the 1,614 punks are dead. They use the "simple rot" heads that the existing on-chain renderer uses (`img/dead-heads-simple`), so the image matches today's on-chain art exactly. The Arweave images use unique per-punk rot (`img/dead-heads`), so dead punks differ from Arweave in their rot texture. Apart from the background color, alive punks match Arweave exactly.
 
 ## Packed data format
 
@@ -93,18 +99,20 @@ Because the layers are flattened into a single grid, nothing overlaps. That also
 node scripts/pack-layer-data.js
 ```
 
-Layout of the 41,506-byte blob (big-endian):
+Layout of the 41,473-byte blob (big-endian):
 
 | Section | Format |
 |---|---|
-| Palette | `u16 count`, then 3-byte RGB colors (274) |
+| Palette | `u16 count`, then 3-byte RGB colors (273) |
 | Layer index | `u16 count`, then 8-byte entries sorted by key: `u32 key, u16 firstRun, u16 runCount` (242) |
 | Token IDs | `u16 count`, then `u16` token IDs in hyperstructure order (1,614) |
-| Runs | 3 bytes each, `x:5 \| y:5 \| length:5 \| colorIndex:9` (11,838) |
+| Runs | 3 bytes each, `x:5 \| y:5 \| length:5 \| colorIndex:9` (11,828) |
 
 A layer key packs the parts of a layer ID such as `9-3-1` into four bytes, with `0xFF` for missing parts. One-of-one layers use `0xFE` in the top byte and the token ID below it.
 
 Each data contract's code is a STOP byte (`0x00`) followed by its part of the blob, so calling it does nothing. `RadioactivePunksImage` reads only the bytes it needs with `EXTCODECOPY`: the palette, index and token list, then just the ~11 layers a punk uses. The trait bytes start at byte 182 of the hyperstructure's code on mainnet. The constructor's token 0 check guards that offset.
+
+Every shape in the art is an axis-aligned rectangle: 23,789 single pixels plus the ten 24×24 one-of-one backgrounds. The packer fills each rectangle's cells and fails if it ever finds a shape that isn't a rectangle.
 
 One quirk in the art: two white eye pixels in layer `4-3` ("Cute" eyes) carry an extra `xmlns` attribute. The packer reads path attributes in any order, so they're kept. Missing them caused a 2-pixel difference on 138 punks in early testing.
 
@@ -137,11 +145,11 @@ Measured deploy gas, priced at 0.078 gwei and $2,700 per ETH:
 
 | Contract | Gas | ETH | USD |
 |---|---|---|---|
-| `RadioactivePunksLayerData1` | 5,239,455 | 0.000409 | $1.10 |
-| `RadioactivePunksLayerData2` | 3,840,404 | 0.000300 | $0.81 |
+| `RadioactivePunksLayerData1` | 5,238,855 | 0.000409 | $1.10 |
+| `RadioactivePunksLayerData2` | 3,833,302 | 0.000299 | $0.81 |
 | `RadioactivePunksImage` | 976,906 | 0.000076 | $0.21 |
 | `RadioactivePunksJSONV2` | 703,387 | 0.000055 | $0.15 |
-| **Total** | **10,760,152** | **0.000839** | **$2.27** |
+| **Total** | **10,752,450** | **0.000839** | **$2.26** |
 
 - Nearly all of the cost is the 200 gas per byte of deployed code for the 41.5 KB of art.
 - The EIP-7623 calldata floor doesn't apply to any of these deploys.
@@ -178,8 +186,8 @@ Both suites deploy everything locally, including a copy of the trait data and of
 
 The JavaScript reference itself was checked in headless Chrome:
 
-- It matches the original renderer's stacked `<use>` layers pixel for pixel for all 1,614 punks, at 24px and 240px.
-- It matches the Arweave `image` exactly for a sample of alive punks, including one-of-ones.
+- For all 1,614 punks, every pixel matches the original renderer's stacked `<use>` layers, except pixels that were the old `#1f2e3d` background, which are now `#473682`. No `#1f2e3d` remains in any image.
+- Before the background change, it matched the Arweave `image` exactly for a sample of alive punks, including one-of-ones.
 
 ```
 node scripts/reference-svg.js 6   # prints token 6's SVG

@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const { parseLayers, readSpritesheet, readTokenOrder } = require('./pack-layer-data');
 
-const BG = '1f2e3d';
+const BG = '473682';
 const ONE_OF_ONES = [698, 2536, 60, 370, 528, 246, 420, 201, 1360, 878];
 
 // token ID -> 32 hex chars, from RadioactivePunksBytesHyperstructure's source

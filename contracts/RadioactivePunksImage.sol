@@ -43,7 +43,7 @@ contract RadioactivePunksImage {
   uint256 private constant HEAD = 3;
 
   bytes private constant SVG_START =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges"><rect width="24" height="24" fill="#1f2e3d"/>';
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges"><rect width="24" height="24" fill="#473682"/>';
 
   // longest possible output: every cell its own run and its own color
   uint256 private constant MAX_SVG_LENGTH = 25000;
