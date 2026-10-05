@@ -188,7 +188,7 @@ contract ${name} {
   return files;
 }
 
-module.exports = { pack, parseLayers, readSpritesheet, readTokenOrder, layerKey };
+module.exports = { pack, parseLayers, readSpritesheet, readTokenOrder, layerKey, CHUNK_SIZE };
 
 if (require.main === module) {
   const { blob, colors, entries, runs, tokens } = pack();

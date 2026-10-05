@@ -141,6 +141,37 @@ Deploy in this order:
 3. `RadioactivePunksImage(0x60de3cd89bc8042a1cad6375fbcc11ea29c43e99, <LayerData1>, <LayerData2>)`
 4. `RadioactivePunksJSONV2(0x5694010444cC8fbbed96c23a65FbC3714F624A26, <Image>)`
 
+### With the deploy page
+
+```
+npm run deploy-page
+```
+
+This does a clean compile, packages the tested bytecode for the page, and serves it at http://localhost:5173. Wallet extensions don't connect to pages opened straight from disk, so it needs the local server.
+
+1. **Connect your wallet.** Wallets are found through EIP-6963, with Rainbow listed first. If you're not on mainnet, the page warns you and offers to switch.
+2. **Deploy each contract in order.** On mainnet, the trait data and original renderer addresses are pre-filled, and each step's address fills into the later steps automatically.
+3. **Check the deployment.** Render any punk through the new `RadioactivePunksJSONV2`, then copy the exact `setAPIBaseURL` value.
+
+The page checks your inputs before anything is sent:
+
+- Every address field is checked on-chain. The layer data and image fields must match the tested contracts exactly, so wrong or swapped addresses are flagged.
+- Each deploy's gas and cost are estimated at the live gas price.
+- A deploy that would revert shows why, e.g. `Reverted with WrongTraitsContract()`.
+
+After each deploy:
+
+- The new contract's code is compared with the tested build, ignoring the constructor's address values.
+- Addresses and transactions are saved in your browser, per chain, so a reload doesn't lose progress.
+
+The page deploys bytecode from solc 0.8.20 with 200 optimizer runs and the default EVM version (Shanghai), the same build the tests run against. `scripts/build-deploy-page.js` refuses to package anything else. To verify the contracts on Etherscan, use those settings and the page's **Download Standard-JSON input** link, which covers all four contracts.
+
+Files:
+
+- `deploy/index.html`, `deploy/app.js`: the page, using [viem](https://viem.sh) 2.57.3.
+- `scripts/build-deploy-page.js`: writes `deploy/contracts.js` (ABIs, bytecode and expected code) and `deploy/standard-input.json`. Both are generated and git-ignored.
+- `scripts/serve-deploy-page.js`: the local server.
+
 Measured deploy gas, priced at 0.078 gwei and $2,700 per ETH:
 
 | Contract | Gas | ETH | USD |
