@@ -15,6 +15,13 @@ pragma solidity ^0.8.31;
  *      Uses the CLZ opcode (EIP-7939), so compile with `evmVersion: osaka`.
  *
  *      e.g. web3://<this address>/tokenJSON/0
+ *
+ *      The original RPUNK contract builds token URIs as
+ *      `<API_BASE_URL><tokenId>.json`. With the base URL set to
+ *      `web3://<this address>/tokenJSON/string!`, token URIs become
+ *      `web3://<this address>/tokenJSON/string!8.json`, which ERC-4804 routes
+ *      to `tokenJSON(string)` and serves as `application/json` based on the
+ *      `.json` suffix of the last argument.
  */
 contract RadioactivePunksJSON {
   address public constant RENDERER = 0x3d687421fefb01e69b9aeEc9EA3706D13A7C135F;
@@ -22,7 +29,37 @@ contract RadioactivePunksJSON {
   // length of "data:application/json,"
   uint256 private constant PREFIX_LENGTH = 22;
 
+  error InvalidTokenPath();
+
   function tokenJSON(uint256 tokenId) external view returns (string memory) {
+    _tokenJSON(tokenId);
+  }
+
+  /**
+   * @dev Accepts `<tokenId>.json`, e.g. `8.json` or `9999.json`. Reverts with
+   *      InvalidTokenPath unless the input is one or more ASCII digits
+   *      followed by exactly `.json`.
+   */
+  function tokenJSON(string calldata path) external view returns (string memory) {
+    bytes calldata b = bytes(path);
+    uint256 digits = b.length;
+    if (digits < 6 || bytes5(b[digits - 5:]) != ".json") revert InvalidTokenPath();
+    digits -= 5;
+
+    uint256 tokenId;
+    for (uint256 i = 0; i < digits; i++) {
+      uint8 c = uint8(b[i]);
+      if (c < 48 || c > 57) revert InvalidTokenPath();
+      tokenId = tokenId * 10 + (c - 48);
+    }
+
+    _tokenJSON(tokenId);
+  }
+
+  /**
+   * @dev Writes the ABI-encoded JSON string as return data and ends the call.
+   */
+  function _tokenJSON(uint256 tokenId) private view {
     assembly {
       function hexValue(c) -> v {
         v := sub(c, 48)
