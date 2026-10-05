@@ -84,7 +84,7 @@ Approximately `0.44560054 Ether` for all original contracts combined.
 
 ### RadioactivePunksJSON.sol
 * New wrapper to support ERC-4804 tokenJSON
-* https://etherscan.io/tx/0x029115d9da775889ad2d2168aef674ebe04f5f08eaeb8d4109e7c4ec1afff894
+* https://etherscan.io/tx/0x03caec478fa74e2d87e9383d39623b68662445580ef522e4f164298ffe47b8a1
 
 ### RadioactivePunksSVGChunk1.sol
 * 19.27 gwei
