@@ -14,7 +14,7 @@ You may use the [Radioactive Punks Operating System Website](https://radioactive
 
 Radioactive Punks can be bought on [our site](https://radioactivepunks.xyz) and on [OpenSea](https://opensea.io/collection/radioactive-punks) etc.
 
-The original data on Arweave can be found by appending token ID to base URL `https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/<token_id>.json`, for example here is (RPunk #6 on Arweave)[https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/6.json].
+The original data on Arweave can be found by appending token ID to base URL `https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/<token_id>.json`, for example here is [RPunk #6 on Arweave](https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/6.json).
 
 ## Setting Up
 
