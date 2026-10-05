@@ -42,11 +42,21 @@ contract RadioactivePunksImage {
   uint256 private constant MORTALITY = 1;
   uint256 private constant HEAD = 3;
 
+  // The glow is drawn in its own colors: six shared ones (head outlines,
+  // glowing hair, hats, smoke, beards, noses and horns, plus the one-of-ones
+  // that reuse them) and one each for the one-of-ones 698, 60, 370, 246 and
+  // 420. None is used for anything else. Each color is written as a single
+  // <path>, so the glow pulses by matching its fill. Full opacity at the start
+  // keeps static snapshots unchanged.
   bytes private constant SVG_START =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges"><rect width="24" height="24" fill="#473682"/>';
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges"><style>'
+    '[fill="#7cff2f"],[fill="#00f8ff"],[fill="#fd8fff"],[fill="#96ff95"],[fill="#45ba79"],[fill="#ff4830"],'
+    '[fill="#9aff58"],[fill="#00d3ff"],[fill="#00d0ff"],[fill="#08c3cc"],[fill="#ff90fa"]'
+    '{animation:g 2s ease-in-out infinite alternate}@keyframes g{to{opacity:.4}}'
+    '</style><rect width="24" height="24" fill="#473682"/>';
 
   // longest possible output: every cell its own run and its own color
-  uint256 private constant MAX_SVG_LENGTH = 25000;
+  uint256 private constant MAX_SVG_LENGTH = 25400;
 
   constructor(address traits_, address layerData1_, address layerData2_) {
     traits = traits_;

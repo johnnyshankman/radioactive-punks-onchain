@@ -71,13 +71,28 @@ Apart from `animation_url` becoming `image`, the JSON is identical to `Radioacti
    - The 10 one-of-one tokens (698, 2536, 60, 370, 528, 246, 420, 201, 1360, 878) draw their own single image.
    - IDs with no art (e.g. `6-0`, "no beard") draw nothing, just like the original's `<use>` of a missing symbol.
 3. **Stack.** Each layer's color runs are painted into a 24×24 grid, later layers covering earlier ones.
-4. **Write SVG.** The grid becomes horizontal runs, with one `<path>` per color in order of first appearance, on a `#473682` purple background:
+4. **Write SVG.** The grid becomes horizontal runs, with one `<path>` per color in order of first appearance, on a `#473682` purple background, after a fixed `<style>` that animates the glow:
 
 ```svg
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges"><rect width="24" height="24" fill="#473682"/><path fill="#7cff2f" d="M5 2h3v1h-3z..."/>...</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges"><style>[fill="#7cff2f"],...{animation:g 2s ease-in-out infinite alternate}@keyframes g{to{opacity:.4}}</style><rect width="24" height="24" fill="#473682"/><path fill="#7cff2f" d="M5 2h3v1h-3z..."/>...</svg>
 ```
 
-Output is 1.6 to 4.1 KB of SVG per punk (about 2.5 KB on average), roughly 2.5× smaller than the Arweave versions.
+Output is 1.8 to 4.4 KB of SVG per punk, including the glow style, still about 2× smaller than the Arweave versions.
+
+### Glow animation
+
+Every punk's radioactive glow pulses: it fades to 40% opacity and back every 4 seconds. The rest of the punk doesn't move.
+
+The glow isn't a layer of its own. It's drawn into the head layers (the outline) and into the glow variants of hair, hats, smoke, beards, noses and horns. But it only ever uses its own colors, and nothing else in the art uses them:
+
+| Colors | Used by |
+|---|---|
+| `#7cff2f` `#00f8ff` `#fd8fff` `#96ff95` `#45ba79` `#ff4830` | every regular punk's glow, and one-of-ones 2536, 528, 201, 1360 and 878 |
+| `#9aff58` `#00d3ff` `#00d0ff` `#08c3cc` `#ff90fa` | the glows of one-of-ones 698, 60, 370, 246 and 420, one each |
+
+Since each color is written as a single `<path>`, the style matches the glow by its `fill`. The style is a constant, so the per-punk rendering is unchanged.
+
+The first frame is at full opacity, so a still snapshot (such as a marketplace thumbnail rasterized to PNG) looks exactly like the static art. Browsers play the animation when the SVG is shown directly, including as an `<img>` or a data URI.
 
 ### Background
 
@@ -223,5 +238,13 @@ The JavaScript reference itself was checked in headless Chrome:
 ```
 node scripts/reference-svg.js 6   # prints token 6's SVG
 ```
+
+To look at the glow animation:
+
+```
+npx hardhat run scripts/preview-images.js
+```
+
+This deploys the contracts to a local Hardhat network, renders a sample of punks (each glow alive and dead, horns, glowing beard, nose and smoke, and all 10 one-of-ones) and writes `preview/index.html` (git-ignored). Each punk is shown as an `<img>` data URI, the way wallets and marketplaces embed it, both static and pulsing, at a few sizes. Open it in a browser or serve the folder (`python3 -m http.server -d preview`).
 
 The tests run on solc 0.8.20, the repo's default compiler. Hardhat 2.14 can't run newer EVM instructions locally, so building with a newer compiler for deployment produces different bytecode than what was tested here, even though the source is the same.

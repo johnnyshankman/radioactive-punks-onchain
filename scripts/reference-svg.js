@@ -13,6 +13,15 @@ const { parseLayers, readSpritesheet, readTokenOrder } = require('./pack-layer-d
 const BG = '473682';
 const ONE_OF_ONES = [698, 2536, 60, 370, 528, 246, 420, 201, 1360, 878];
 
+// the colors the radioactive glow is drawn in: six shared ones, then the own
+// glows of one-of-ones 698, 60, 370, 246 and 420
+const GLOW_COLORS = [
+  '7cff2f', '00f8ff', 'fd8fff', '96ff95', '45ba79', 'ff4830',
+  '9aff58', '00d3ff', '00d0ff', '08c3cc', 'ff90fa',
+];
+const GLOW_STYLE = `<style>${GLOW_COLORS.map((c) => `[fill="#${c}"]`).join(',')}`
+  + '{animation:g 2s ease-in-out infinite alternate}@keyframes g{to{opacity:.4}}</style>';
+
 // token ID -> 32 hex chars, from RadioactivePunksBytesHyperstructure's source
 function readTraits() {
   const src = fs.readFileSync(path.join(__dirname, '..', 'contracts', 'RadioactivePunksBytesHyperstructure.sol'), 'utf8');
@@ -65,7 +74,7 @@ function toSVG(grid) {
       x += len;
     }
   }
-  let body = `<rect width="24" height="24" fill="#${BG}"/>`;
+  let body = `${GLOW_STYLE}<rect width="24" height="24" fill="#${BG}"/>`;
   for (const [c, d] of byColor) body += `<path fill="#${c}" d="${d}"/>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">${body}</svg>`;
 }
@@ -88,7 +97,7 @@ function createReference() {
   };
 }
 
-module.exports = { createReference, layerIds };
+module.exports = { createReference, layerIds, GLOW_COLORS, GLOW_STYLE };
 
 if (require.main === module) {
   console.log(createReference().tokenSVG(Number(process.argv[2] || 0)));
