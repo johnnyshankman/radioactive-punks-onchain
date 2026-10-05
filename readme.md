@@ -51,6 +51,8 @@ Deployment is modular and split across five main components:
 
 `RadioactivePunksJSON`: responsible for producing ERC-4804 compliant NFT tokenJSON() (to use as response of web3:// URLs)
 
+`RadioactivePunksImage` + `RadioactivePunksJSONV2`: an on-chain static SVG `image` for every punk, and tokenJSON() that uses it instead of `animation_url` (not yet deployed, see [image-renderer.md](image-renderer.md))
+
 `RadioactivePunksBytesHyperstructure`: the encoded trait data of every punk as bytes in groups of 15
 
 `RadioactivePunksSVGChunk1`: gzipped SVG layer data for all punks
