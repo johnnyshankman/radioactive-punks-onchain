@@ -48,6 +48,7 @@ function pickTokens(traits) {
   add('glowing beard', ids.find((id) => b(id, 6) === 1));
   add('glowing nose', ids.find((id) => b(id, 10) === 4));
   add('smoke', ids.find((id) => b(id, 13) !== 0 && b(id, 13) !== 12));
+  for (const id of [1665, 2792, 1445]) add('rainbow head', id);
   for (const id of ONE_OF_ONES) add('one-of-one', id);
   return picks;
 }

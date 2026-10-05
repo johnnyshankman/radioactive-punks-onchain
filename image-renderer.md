@@ -245,6 +245,6 @@ To look at the glow animation:
 npx hardhat run scripts/preview-images.js
 ```
 
-This deploys the contracts to a local Hardhat network, renders a sample of punks (each glow alive and dead, horns, glowing beard, nose and smoke, and all 10 one-of-ones) and writes `preview/index.html` (git-ignored). Each punk is shown as an `<img>` data URI, the way wallets and marketplaces embed it, both static and pulsing, at a few sizes. Open it in a browser or serve the folder (`python3 -m http.server -d preview`).
+This deploys the contracts to a local Hardhat network, renders a sample of punks (each glow alive and dead, horns, glowing beard, nose and smoke, rainbow heads 1665, 2792 and 1445, and all 10 one-of-ones) and writes `preview/index.html` (git-ignored). Each punk is shown as an `<img>` data URI, the way wallets and marketplaces embed it, both static and pulsing, at a few sizes. Open it in a browser or serve the folder (`python3 -m http.server -d preview`).
 
 The tests run on solc 0.8.20, the repo's default compiler. Hardhat 2.14 can't run newer EVM instructions locally, so building with a newer compiler for deployment produces different bytecode than what was tested here, even though the source is the same.
