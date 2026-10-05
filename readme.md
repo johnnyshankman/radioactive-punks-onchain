@@ -136,8 +136,7 @@ Want to create an API that serves a chained punk or your own similar on chain `I
 
 1. Had I reordered the BytesHyperstructure to use the same indexing as the original NFT contract, I could've avoided the need for the entire `TOKEN_ID_TO_BYTES_LOOKUP` data structure, saving quite a lot of gas on deployment.
 2. I probably could've used SSTORE2 for a few minor strings to save minor amounts of gas upon deployment of the `RadioactivePunksRenderer.sol` file.
-3. Maybe use [EIP-681](https://eips.ethereum.org/EIPS/eip-681) or [EIP-4804](
-https://eips.ethereum.org/EIPS/eip-4804) on the original NFT contract's `tokenURI` though the contract haphazardly appends `.json` at the end of every returned URI so that may never be a feasible thing for us.
+3. ~~Maybe use [EIP-681](https://eips.ethereum.org/EIPS/eip-681) or [EIP-4804](https://eips.ethereum.org/EIPS/eip-4804) on the original NFT contract's `tokenURI` though the contract haphazardly appends `.json` at the end of every returned URI so that may never be a feasible thing for us.~~ Solved with [ERC-4804](https://eips.ethereum.org/EIPS/eip-4804). The original contract builds token URIs as `<API_BASE_URL><tokenId>.json`, and a bare `8.json` argument in a `web3://` URL is treated as a domain name. ERC-4804's explicit `string!` argument type works around that: with the base URL set to `web3://<JSON contract>/tokenJSON/string!`, token URIs become `web3://<JSON contract>/tokenJSON/string!8.json`. That calls `tokenJSON(string)`, which reads the token ID from `"8.json"`, and the `.json` suffix makes ERC-4804 clients serve the result as `application/json`. `RadioactivePunksJSON` and `RadioactivePunksJSONV2` both support it, see [image-renderer.md](image-renderer.md).
 
 ## Shoutouts
 
