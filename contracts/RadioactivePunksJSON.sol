@@ -5,7 +5,7 @@ pragma solidity ^0.8.31;
 /**
  * @dev ERC-4804 (web3://) metadata endpoint for Radioactive Punks.
  *
- *      Reuses the already-deployed RadioactivePunksRenderer for all data and
+ *      Reuses the already-deployed RadioactivePunksRendererV2 for all data and
  *      rendering. The renderer returns `data:application/json,<uri-encoded
  *      JSON>`; this contract strips the data URI prefix and URI-decodes the
  *      payload once, yielding raw JSON. The nested `animation_url` is
@@ -14,14 +14,17 @@ pragma solidity ^0.8.31;
  *
  *      Uses the CLZ opcode (EIP-7939), so compile with `evmVersion: osaka`.
  *
- *      e.g. web3://<this address>/tokenJSON/0
+ *      Two equivalent ways to request a punk's JSON:
  *
- *      The original RPUNK contract builds token URIs as
- *      `<API_BASE_URL><tokenId>.json`. With the base URL set to
- *      `web3://<this address>/tokenJSON/string!`, token URIs become
- *      `web3://<this address>/tokenJSON/string!8.json`, which ERC-4804 routes
- *      to `tokenJSON(string)` and serves as `application/json` based on the
- *      `.json` suffix of the last argument.
+ *        web3://<this address>/tokenJSON/string!8.json  -> tokenJSON(string)
+ *        web3://<this address>/tokenJSON/8              -> tokenJSON(uint256)
+ *
+ *      The first is what the original RPUNK contract produces. It builds token
+ *      URIs as `<API_BASE_URL><tokenId>.json`, so set its base URL to
+ *      `web3://<this address>/tokenJSON/string!`. ERC-4804 needs the explicit
+ *      `string!` type because it treats a bare `8.json` argument as a domain
+ *      name. The `.json` suffix of the last argument also tells ERC-4804
+ *      clients to serve the result as `application/json`.
  */
 contract RadioactivePunksJSON {
   address public constant RENDERER = 0x3d687421fefb01e69b9aeEc9EA3706D13A7C135F;
@@ -31,12 +34,17 @@ contract RadioactivePunksJSON {
 
   error InvalidTokenPath();
 
+  /**
+   * @dev e.g. web3://<this address>/tokenJSON/8
+   */
   function tokenJSON(uint256 tokenId) external view returns (string memory) {
     _tokenJSON(tokenId);
   }
 
   /**
-   * @dev Accepts `<tokenId>.json`, e.g. `8.json` or `9999.json`. Reverts with
+   * @dev e.g. web3://<this address>/tokenJSON/string!8.json
+   *
+   *      Accepts `<tokenId>.json`, e.g. `8.json` or `9999.json`. Reverts with
    *      InvalidTokenPath unless the input is one or more ASCII digits
    *      followed by exactly `.json`.
    */
