@@ -61,7 +61,9 @@ Deployment is modular and split across five main components:
 
 `DataCompiler`: helpful functions for concatenating data into valid Data URI formats
 
-Why no use of "SSTORE2" you may ask? Well once you fill up the entire contract with bytes or string data there is no efficiency to be gained by using SSTORE2, it actually requires more overhead.
+Why no use of "SSTORE2" in the original contracts, you may ask? Well once you fill up the entire contract with bytes or string data there is no efficiency to be gained on deployment by using SSTORE2: either way you pay 200 gas per byte of code, and SSTORE2 adds a little overhead.
+
+Where SSTORE2 does pay off is reading only part of the data. The original renderer sends every layer to the browser, so it reads each chunk whole through its `data()` getter. `RadioactivePunksImage` only needs the ~11 layers a single punk uses, so its `RadioactivePunksLayerData` chunks store their data as contract code, SSTORE2-style, and it copies just the bytes it needs with `EXTCODECOPY`. That cut the gas to load a punk's data from about 544K (through `data()` getters) to about 39K.
 
 ## How does the punk render?
 
@@ -135,7 +137,7 @@ Want to create an API that serves a chained punk or your own similar on chain `I
 ## Improvements and Oversights
 
 1. Had I reordered the BytesHyperstructure to use the same indexing as the original NFT contract, I could've avoided the need for the entire `TOKEN_ID_TO_BYTES_LOOKUP` data structure, saving quite a lot of gas on deployment.
-2. I probably could've used SSTORE2 for a few minor strings to save minor amounts of gas upon deployment of the `RadioactivePunksRenderer.sol` file.
+2. I probably could've used SSTORE2 for a few minor strings to save minor amounts of gas upon deployment of the `RadioactivePunksRenderer.sol` file. The newer `RadioactivePunksImage` does use SSTORE2-style storage for its layer data, for cheaper reads rather than cheaper deployment (see Design above).
 3. ~~Maybe use [EIP-681](https://eips.ethereum.org/EIPS/eip-681) or [EIP-4804](https://eips.ethereum.org/EIPS/eip-4804) on the original NFT contract's `tokenURI` though the contract haphazardly appends `.json` at the end of every returned URI so that may never be a feasible thing for us.~~ Solved with [ERC-4804](https://eips.ethereum.org/EIPS/eip-4804). The original contract builds token URIs as `<API_BASE_URL><tokenId>.json`, and a bare `8.json` argument in a `web3://` URL is treated as a domain name. ERC-4804's explicit `string!` argument type works around that: with the base URL set to `web3://<JSON contract>/tokenJSON/string!`, token URIs become `web3://<JSON contract>/tokenJSON/string!8.json`. That calls `tokenJSON(string)`, which reads the token ID from `"8.json"`, and the `.json` suffix makes ERC-4804 clients serve the result as `application/json`. `RadioactivePunksJSON` and `RadioactivePunksJSONV2` both support it, see [image-renderer.md](image-renderer.md).
 
 ## Shoutouts
