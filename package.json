@@ -7,7 +7,8 @@
     "coverage": "hardhat coverage",
     "compile": "hardhat compile",
     "lint": "solhint contracts/*",
-    "encode": "node ./encodeTraits.mjs"
+    "encode": "node ./encodeTraits.mjs",
+    "deploy-page": "hardhat clean && hardhat compile && node scripts/build-deploy-page.js && node scripts/serve-deploy-page.js"
   },
   "author": "",
   "license": "ISC",

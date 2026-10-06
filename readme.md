@@ -14,6 +14,10 @@ You may use the [Radioactive Punks Operating System Website](https://radioactive
 
 Radioactive Punks can be bought on [our site](https://radioactivepunks.xyz) and on [OpenSea](https://opensea.io/collection/radioactive-punks) etc.
 
+The NFT contract's `tokenURI` now serves fully on-chain metadata through [ERC-4804](https://eips.ethereum.org/EIPS/eip-4804) `web3://` URLs, e.g. `web3://0xC36C3b966e227F7a68C49512b4bdb4Ca7643c5c3/tokenJSON/string!6.json` for RPunk #6. They resolve to `RadioactivePunksJSONV2`, whose JSON has an on-chain SVG `image`, see [image-renderer.md](image-renderer.md).
+
+The original data on Arweave can be found by appending token ID to base URL `https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/<token_id>.json`, for example here is [RPunk #6 on Arweave](https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/6.json). It was the NFT contract's base URL before the switch to `web3://`.
+
 ## Setting Up
 
 ```bash
@@ -45,7 +49,11 @@ This is not an ERC-721 token, it is a `ITokenURISupplier` and therefore contains
 
 Deployment is modular and split across five main components:
 
-`RadioactivePunksRenderer`: responsible producing an on-chain `tokenURI`
+`RadioactivePunksRendererV2`: responsible producing JSON Data URL
+
+`RadioactivePunksJSON`: responsible for producing ERC-4804 compliant NFT tokenJSON() (to use as response of web3:// URLs)
+
+`RadioactivePunksImage` + `RadioactivePunksJSONV2`: an on-chain SVG `image` for every punk, and tokenJSON() that uses it instead of `animation_url` (see [image-renderer.md](image-renderer.md))
 
 `RadioactivePunksBytesHyperstructure`: the encoded trait data of every punk as bytes in groups of 15
 
@@ -55,7 +63,9 @@ Deployment is modular and split across five main components:
 
 `DataCompiler`: helpful functions for concatenating data into valid Data URI formats
 
-Why no use of "SSTORE2" you may ask? Well once you fill up the entire contract with bytes or string data there is no efficiency to be gained by using SSTORE2, it actually reuquires more overhead.
+Why no use of "SSTORE2" in the original contracts, you may ask? Well once you fill up the entire contract with bytes or string data there is no efficiency to be gained on deployment by using SSTORE2: either way you pay 200 gas per byte of code, and SSTORE2 adds a little overhead.
+
+Where SSTORE2 does pay off is reading only part of the data. The original renderer sends every layer to the browser, so it reads each chunk whole through its `data()` getter. `RadioactivePunksImage` only needs the ~11 layers a single punk uses, so its `RadioactivePunksLayerData` chunks store their data as contract code, SSTORE2-style, and it copies just the bytes it needs with `EXTCODECOPY`. That cut the gas to load a punk's data from about 544K (through `data()` getters) to about 39K.
 
 ## How does the punk render?
 
@@ -65,7 +75,7 @@ If you'd like to download your punk, right clicking anywhere on the page will tr
 
 ## What was the deployment cost?
 
-Approximately `0.44560054 Ether` for all contracts combined.
+Approximately `0.44560054 Ether` for all original contracts combined.
 
 ## Contracts Deployed
 
@@ -73,6 +83,38 @@ Approximately `0.44560054 Ether` for all contracts combined.
 * 13 gwei
 * 0.16157843 ETH
 * https://etherscan.io/tx/0xea7806d3943a14c162dc35ad3c720574f3e937934721f096fa7b9f21c722e669
+
+### RadioactivePunksRendererV2.sol
+* New wrapper to fix minor rendering bug
+* https://etherscan.io/tx/0x7a4b7f2813ab4419364934a3de9d1a268e900d6cfb0ed655bfa494a1b9158127
+
+### RadioactivePunksJSON.sol
+* New wrapper to support ERC-4804 tokenJSON
+* https://etherscan.io/tx/0x03caec478fa74e2d87e9383d39623b68662445580ef522e4f164298ffe47b8a1
+
+### RadioactivePunksLayerData1.sol
+* Packed layer art for the on-chain image renderer, part 1
+* 0.156 gwei
+* 0.000817 ETH
+* https://etherscan.io/tx/0x624dbbf15c3226f41295348ff7fee71e3d3c55a519d6af4a84a186bdcb25e7bc
+
+### RadioactivePunksLayerData2.sol
+* Packed layer art for the on-chain image renderer, part 2
+* 0.176 gwei
+* 0.000675 ETH
+* https://etherscan.io/tx/0x96f9a31529362f810e1a2b4d5237bc965a715513a6509dcfa463c224f6dd279e
+
+### RadioactivePunksImage.sol
+* On-chain SVG image renderer, with a pulsing radioactive glow
+* 0.291 gwei
+* 0.000302 ETH
+* https://etherscan.io/tx/0xd7cdec82416375863d5c67d5a04a33d53cab8be23cf58fdffd2ea47bd705ac00
+
+### RadioactivePunksJSONV2.sol
+* ERC-4804 tokenJSON with the on-chain `image` instead of `animation_url`
+* 0.207 gwei
+* 0.000146 ETH
+* https://etherscan.io/tx/0xdfd523511345adbed9f6374019ba8ffc884ec4a3c28353c8e196a237649aed81
 
 ### RadioactivePunksSVGChunk1.sol
 * 19.27 gwei
@@ -121,9 +163,8 @@ Want to create an API that serves a chained punk or your own similar on chain `I
 ## Improvements and Oversights
 
 1. Had I reordered the BytesHyperstructure to use the same indexing as the original NFT contract, I could've avoided the need for the entire `TOKEN_ID_TO_BYTES_LOOKUP` data structure, saving quite a lot of gas on deployment.
-2. I probably could've used SSTORE2 for a few minor strings to save minor amounts of gas upon deployment of the `RadioactivePunksRenderer.sol` file.
-3. Maybe use [EIP-681](https://eips.ethereum.org/EIPS/eip-681) or [EIP-4804](
-https://eips.ethereum.org/EIPS/eip-4804) on the original NFT contract's `tokenURI` though the contract haphazardly appends `.json` at the end of every returned URI so that may never be a feasible thing for us.
+2. I probably could've used SSTORE2 for a few minor strings to save minor amounts of gas upon deployment of the `RadioactivePunksRenderer.sol` file. The newer `RadioactivePunksImage` does use SSTORE2-style storage for its layer data, for cheaper reads rather than cheaper deployment (see Design above).
+3. ~~Maybe use [EIP-681](https://eips.ethereum.org/EIPS/eip-681) or [EIP-4804](https://eips.ethereum.org/EIPS/eip-4804) on the original NFT contract's `tokenURI` though the contract haphazardly appends `.json` at the end of every returned URI so that may never be a feasible thing for us.~~ Solved with [ERC-4804](https://eips.ethereum.org/EIPS/eip-4804). The original contract builds token URIs as `<API_BASE_URL><tokenId>.json`, and a bare `8.json` argument in a `web3://` URL is treated as a domain name. ERC-4804's explicit `string!` argument type works around that: with the base URL set to `web3://<JSON contract>/tokenJSON/string!`, token URIs become `web3://<JSON contract>/tokenJSON/string!8.json`. That calls `tokenJSON(string)`, which reads the token ID from `"8.json"`, and the `.json` suffix makes ERC-4804 clients serve the result as `application/json`. `RadioactivePunksJSON` and `RadioactivePunksJSONV2` both support it, see [image-renderer.md](image-renderer.md).
 
 ## Shoutouts
 

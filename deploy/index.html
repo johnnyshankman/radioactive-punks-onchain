@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Radioactive Punks Image Renderer Deploy</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      --bg: #f6f5fb;
+      --card: #ffffff;
+      --text: #1c1830;
+      --muted: #6b6684;
+      --border: #e2dff0;
+      --accent: #473682;
+      --accent-text: #ffffff;
+      --ok: #1f7a46;
+      --ok-bg: #e5f5ec;
+      --warn: #8a5a00;
+      --warn-bg: #fff4dc;
+      --err: #b42318;
+      --err-bg: #fdecea;
+      --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #14121d;
+        --card: #1d1a2a;
+        --text: #ece9f7;
+        --muted: #a39dbd;
+        --border: #312c45;
+        --accent: #7c66d6;
+        --ok: #6fd69c;
+        --ok-bg: #173226;
+        --warn: #f2c35b;
+        --warn-bg: #352a12;
+        --err: #ff8a80;
+        --err-bg: #3a1a1a;
+      }
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, sans-serif; }
+    main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+    h1 { font-size: 24px; margin: 0 0 4px; }
+    h2 { font-size: 17px; margin: 0 0 4px; }
+    p { margin: 0 0 12px; }
+    .muted { color: var(--muted); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 16px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    button {
+      font: inherit; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-text);
+      border-radius: 8px; padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    }
+    button.secondary { background: transparent; color: var(--accent); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    button img { width: 20px; height: 20px; border-radius: 4px; }
+    label { display: block; font-weight: 600; margin: 12px 0 4px; font-size: 14px; }
+    input {
+      width: 100%; font: 14px var(--mono); padding: 8px 10px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    }
+    input.invalid { border-color: var(--err); }
+    .hint { font-size: 13px; color: var(--muted); margin-top: 4px; min-height: 1.2em; }
+    .hint.ok { color: var(--ok); }
+    .hint.err { color: var(--err); }
+    .status { margin-top: 12px; padding: 10px 12px; border-radius: 8px; font-size: 14px; word-break: break-word; }
+    .status:empty { display: none; }
+    .status.ok { background: var(--ok-bg); color: var(--ok); }
+    .status.warn { background: var(--warn-bg); color: var(--warn); }
+    .status.err { background: var(--err-bg); color: var(--err); }
+    .status.info { background: var(--bg); color: var(--text); }
+    code, .mono { font-family: var(--mono); font-size: 13px; word-break: break-all; }
+    a { color: var(--accent); }
+    .step-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+    .badge { font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--bg); color: var(--muted); white-space: nowrap; }
+    .badge.done { background: var(--ok-bg); color: var(--ok); }
+    .punk { display: flex; gap: 16px; align-items: center; margin-top: 12px; }
+    .punk img { width: 192px; height: 192px; image-rendering: pixelated; border-radius: 8px; }
+    dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; font-size: 14px; }
+    dt { color: var(--muted); }
+    dd { margin: 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Deploy the image renderer</h1>
+    <p class="muted">Deploys the four contracts for the on-chain <code>image</code> renderer from your wallet. The bytecode is exactly what the test suite ran against.</p>
+
+    <section class="card" id="wallet-card">
+      <h2>Wallet</h2>
+      <div id="wallet-picker">
+        <p class="muted">Choose a wallet to connect.</p>
+        <div class="row" id="wallets"></div>
+      </div>
+      <div id="wallet-connected" hidden>
+        <dl>
+          <dt>Account</dt><dd class="mono" id="account"></dd>
+          <dt>Network</dt><dd id="network"></dd>
+        </dl>
+        <div class="status warn" id="chain-warning"></div>
+      </div>
+    </section>
+
+    <div id="steps"></div>
+
+    <section class="card" id="check-card">
+      <div class="step-head">
+        <h2>Check the deployment</h2>
+      </div>
+      <p class="muted">Renders a punk through your deployed <code>RadioactivePunksJSONV2</code>.</p>
+      <label for="check-token">Token ID</label>
+      <div class="row">
+        <input id="check-token" value="516" style="max-width: 140px">
+        <button id="check-button" disabled>Render</button>
+      </div>
+      <div class="status" id="check-status"></div>
+      <div class="punk" id="check-punk" hidden>
+        <img id="check-image" alt="">
+        <div>
+          <strong id="check-name"></strong>
+          <div class="muted" id="check-traits"></div>
+        </div>
+      </div>
+      <div id="base-url" hidden>
+        <label>Base URL for <code>setAPIBaseURL</code> on the original contract</label>
+        <div class="row">
+          <input id="base-url-value" readonly>
+          <button class="secondary" id="copy-base-url">Copy</button>
+        </div>
+        <div class="hint">Call it on <span class="mono">0x073ca28e04719c05a5a48c1d992091b4075a0f84</span> from the owner wallet, once you've checked how marketplaces show <code>web3://</code> metadata.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Compiler (for Etherscan verification)</h2>
+      <dl id="compiler"></dl>
+    </section>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
