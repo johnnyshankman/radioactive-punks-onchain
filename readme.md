@@ -14,7 +14,9 @@ You may use the [Radioactive Punks Operating System Website](https://radioactive
 
 Radioactive Punks can be bought on [our site](https://radioactivepunks.xyz) and on [OpenSea](https://opensea.io/collection/radioactive-punks) etc.
 
-The original data on Arweave can be found by appending token ID to base URL `https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/<token_id>.json`, for example here is [RPunk #6 on Arweave](https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/6.json).
+The NFT contract's `tokenURI` now serves fully on-chain metadata through [ERC-4804](https://eips.ethereum.org/EIPS/eip-4804) `web3://` URLs, e.g. `web3://0xC36C3b966e227F7a68C49512b4bdb4Ca7643c5c3/tokenJSON/string!6.json` for RPunk #6. They resolve to `RadioactivePunksJSONV2`, whose JSON has an on-chain SVG `image`, see [image-renderer.md](image-renderer.md).
+
+The original data on Arweave can be found by appending token ID to base URL `https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/<token_id>.json`, for example here is [RPunk #6 on Arweave](https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/6.json). It was the NFT contract's base URL before the switch to `web3://`.
 
 ## Setting Up
 

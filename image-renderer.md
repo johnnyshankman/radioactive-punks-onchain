@@ -221,13 +221,26 @@ Measured deploy gas, priced at 0.078 gwei and $2,700 per ETH:
 - The largest deploy (5.24M gas) is well under mainnet's 16.78M per-transaction gas cap.
 - Expect a little more in practice for the priority fee.
 
-To point the original contract at it, call `setAPIBaseURL` on `0x073ca28e04719c05a5a48c1d992091b4075a0f84` from its owner with:
+### Pointing the NFT contract at it
+
+The original NFT contract (`0x073ca28e04719c05a5a48c1d992091b4075a0f84`) now uses this as its base URL, set with `setAPIBaseURL` through its owner, a Safe (`0x780Bf192F272e935985b614Db9Dee1027606b93c`), in [`0x6f24…cd26`](https://etherscan.io/tx/0x6f244952d440c886de3281007c75e925cd3422bf0f63a54d5d9d2ce447e3cd26):
 
 ```
 web3://0xC36C3b966e227F7a68C49512b4bdb4Ca7643c5c3/tokenJSON/string!
 ```
 
-Check how OpenSea and other marketplaces display `web3://` metadata before doing this on mainnet. The base URL can be changed back as long as the contract isn't frozen. The current Arweave base URL is `https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/`.
+So `tokenURI(6)` returns `web3://0xC36C3b966e227F7a68C49512b4bdb4Ca7643c5c3/tokenJSON/string!6.json`.
+
+Checked after the switch:
+
+- The stored base URL is exactly the string above.
+- `tokenURI` returns that pattern for existing tokens and still reverts with `Token DNE` for tokens that don't exist.
+- The NFT contract's 1,614 tokens (`totalSupply` and every `tokenByIndex`) are exactly the 1,614 punks the renderer knows.
+- `tokenJSON("<id>.json")` returns valid JSON for all 1,614. Each has exactly `name`, `artist`, `technologist`, `attributes` and `image`, the right name, 15 attributes, and an `image` byte-identical to `scripts/reference-svg.js`.
+- The reference web3:// client ([web3protocol](https://github.com/web3-protocol/web3protocol-js)) resolves the live `tokenURI`s for #0, #6, #32, #516, #698, #2536 and #2999 to HTTP 200 `application/json` with an `image` and no `animation_url`.
+- For 40 punks across all IDs, including all 10 one-of-ones, `name`, `artist`, `technologist` and `attributes` are identical to `RadioactivePunksJSON`'s.
+
+Marketplaces cache metadata, so they show the change after a metadata refresh. To switch back, call `setAPIBaseURL` with the previous Arweave base URL, `https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/`. That works as long as the contract isn't frozen; it isn't.
 
 ## Testing
 
