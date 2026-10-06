@@ -80,12 +80,19 @@
     dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; font-size: 14px; }
     dt { color: var(--muted); }
     dd { margin: 0; }
+    .plans { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .plans a { padding: 8px 12px; color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .plans a[aria-current="page"] { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
   </style>
 </head>
 <body>
   <main>
-    <h1>Deploy the image renderer</h1>
-    <p class="muted">Deploys the four contracts for the on-chain <code>image</code> renderer from your wallet. The bytecode is exactly what the test suite ran against.</p>
+    <nav class="plans" aria-label="Deploy plans">
+      <a href="./" data-plan="full">Full deploy</a>
+      <a href="./?plan=bitmap" data-plan="bitmap">Bitmap upgrade</a>
+    </nav>
+    <h1 id="title">Deploy the image renderer</h1>
+    <p class="muted" id="intro"></p>
 
     <section class="card" id="wallet-card">
       <h2>Wallet</h2>
@@ -108,7 +115,7 @@
       <div class="step-head">
         <h2>Check the deployment</h2>
       </div>
-      <p class="muted">Renders a punk through your deployed <code>RadioactivePunksJSONV2</code>.</p>
+      <p class="muted">Renders a punk through the <code>RadioactivePunksJSONV2</code> you deployed above.</p>
       <label for="check-token">Token ID</label>
       <div class="row">
         <input id="check-token" value="516" style="max-width: 140px">
@@ -128,7 +135,7 @@
           <input id="base-url-value" readonly>
           <button class="secondary" id="copy-base-url">Copy</button>
         </div>
-        <div class="hint">Call it on <span class="mono">0x073ca28e04719c05a5a48c1d992091b4075a0f84</span> from the owner wallet, once you've checked how marketplaces show <code>web3://</code> metadata.</div>
+        <div class="hint" id="owner-hint"></div>
       </div>
     </section>
 

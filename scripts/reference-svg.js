@@ -84,7 +84,8 @@ function createReference() {
   const traits = readTraits();
   return {
     traits,
-    tokenSVG(tokenId) {
+    // 24 rows of 24 "rrggbb" colors, null where no layer paints
+    tokenGrid(tokenId) {
       const grid = Array.from({ length: 24 }, () => Array(24).fill(null));
       for (const id of layerIds(tokenId, traits[tokenId])) {
         for (const [k, c] of layers[id] || []) {
@@ -92,12 +93,15 @@ function createReference() {
           grid[y][x] = c;
         }
       }
-      return toSVG(grid);
+      return grid;
+    },
+    tokenSVG(tokenId) {
+      return toSVG(this.tokenGrid(tokenId));
     },
   };
 }
 
-module.exports = { createReference, layerIds, GLOW_COLORS, GLOW_STYLE };
+module.exports = { createReference, layerIds, BG, GLOW_COLORS, GLOW_STYLE };
 
 if (require.main === module) {
   console.log(createReference().tokenSVG(Number(process.argv[2] || 0)));

@@ -15,8 +15,13 @@ import { COMPILER, CONTRACTS } from './contracts.js';
 // existing mainnet contracts the new ones read from
 const MAINNET_TRAITS = '0x60de3cd89bc8042a1cad6375fbcc11ea29c43e99';
 const MAINNET_RENDERER = '0x5694010444cC8fbbed96c23a65FbC3714F624A26';
+// deployed by the full plan below, reused by the bitmap upgrade
+const MAINNET_LAYER_DATA_1 = '0x43989D03dC1B2F6CBA55B7B21F3Ba7883d30162f';
+const MAINNET_LAYER_DATA_2 = '0xAB657a842266A9F5c3b18288BD27eb03da00c0F2';
+const NFT = '0x073ca28e04719c05a5a48c1d992091b4075a0f84';
+const NFT_OWNER = '0x780Bf192F272e935985b614Db9Dee1027606b93c';
 
-const STEPS = [
+const FULL_STEPS = [
   {
     id: 'data1',
     contract: 'RadioactivePunksLayerData1',
@@ -54,6 +59,51 @@ const STEPS = [
   },
 ];
 
+const BITMAP_STEPS = [
+  {
+    id: 'image',
+    contract: 'RadioactivePunksImageV2',
+    title: '1. Bitmap image renderer',
+    description: 'Renders each punk as an SVG wrapping two PNGs. Reads the existing trait data and the already deployed layer data, so no art is deployed again.',
+    params: [
+      { name: 'traits', label: 'Trait data (RadioactivePunksBytesHyperstructure)', mainnetDefault: MAINNET_TRAITS, check: 'code' },
+      { name: 'layerData1', label: 'Layer data, part 1 (already deployed)', mainnetDefault: MAINNET_LAYER_DATA_1, check: 'RadioactivePunksLayerData1' },
+      { name: 'layerData2', label: 'Layer data, part 2 (already deployed)', mainnetDefault: MAINNET_LAYER_DATA_2, check: 'RadioactivePunksLayerData2' },
+    ],
+  },
+  {
+    id: 'json',
+    contract: 'RadioactivePunksJSONV2',
+    title: '2. JSON metadata',
+    description: 'A new instance of the same RadioactivePunksJSONV2, pointing at the bitmap image renderer. The live one keeps serving the path-based images until the base URL changes.',
+    params: [
+      { name: 'renderer', label: 'Original renderer (RadioactivePunksRenderer)', mainnetDefault: MAINNET_RENDERER, check: 'code' },
+      { name: 'image', label: 'Bitmap image renderer', from: 'image', check: 'RadioactivePunksImageV2' },
+    ],
+  },
+];
+
+const PLANS = {
+  full: {
+    title: 'Deploy the image renderer',
+    intro: 'Deploys the four contracts for the on-chain image renderer from your wallet. The bytecode is exactly what the test suite ran against.',
+    storage: 'rpunks-image-deploy',
+    image: 'RadioactivePunksImage',
+    steps: FULL_STEPS,
+  },
+  bitmap: {
+    title: 'Upgrade to bitmap images',
+    intro: 'Deploys the two contracts that switch the on-chain image from SVG paths to PNG bitmaps, which have no seams at any size. The layer data, trait data and original renderer already on mainnet are reused. The bytecode is exactly what the test suite ran against.',
+    storage: 'rpunks-image-v2-deploy',
+    image: 'RadioactivePunksImageV2',
+    steps: BITMAP_STEPS,
+  },
+};
+
+const planId = new URLSearchParams(location.search).get('plan') === 'bitmap' ? 'bitmap' : 'full';
+const PLAN = PLANS[planId];
+const STEPS = PLAN.steps;
+
 const $ = (id) => document.getElementById(id);
 const el = (tag, props = {}, children = []) => {
   const node = Object.assign(document.createElement(tag), props);
@@ -72,7 +122,7 @@ const state = {
 
 // ---------- persistence (per chain) ----------
 
-const storageKey = () => `rpunks-image-deploy-${state.chain?.id}`;
+const storageKey = () => `${PLAN.storage}-${state.chain?.id}`;
 const loadDeployed = () => {
   try { return JSON.parse(localStorage.getItem(storageKey())) || {}; } catch { return {}; }
 };
@@ -185,7 +235,7 @@ async function useChain(chainId) {
     warning.replaceChildren();
   } else {
     setStatus(warning, 'warn',
-      'You’re not on Ethereum mainnet. The default addresses for the trait data and the original renderer only exist on mainnet. ',
+      'You’re not on Ethereum mainnet. The default addresses for the existing contracts only exist on mainnet. ',
       el('button', { className: 'secondary', textContent: 'Switch to Ethereum', onclick: () => state.walletClient.switchChain({ id: 1 }).catch((e) => setStatus(warning, 'err', errorMessage(e))) }));
   }
 
@@ -365,7 +415,7 @@ $('check-button').addEventListener('click', async () => {
     $('check-punk').hidden = false;
     setStatus(status, 'ok', `Valid JSON (${text.length.toLocaleString()} characters) with an image and no animation_url.`);
   } catch (e) {
-    setStatus(status, 'err', errorMessage(e, [...CONTRACTS.RadioactivePunksJSONV2.abi, ...CONTRACTS.RadioactivePunksImage.abi]));
+    setStatus(status, 'err', errorMessage(e, [...CONTRACTS.RadioactivePunksJSONV2.abi, ...CONTRACTS[PLAN.image].abi]));
   }
 });
 
@@ -374,6 +424,22 @@ $('copy-base-url').addEventListener('click', async () => {
   $('copy-base-url').textContent = 'Copied';
   setTimeout(() => { $('copy-base-url').textContent = 'Copy'; }, 1500);
 });
+
+// ---------- plan ----------
+
+document.title = `Radioactive Punks ${PLAN.title}`;
+$('title').textContent = PLAN.title;
+$('intro').textContent = PLAN.intro;
+for (const a of document.querySelectorAll('[data-plan]')) {
+  if (a.dataset.plan === planId) a.setAttribute('aria-current', 'page');
+}
+$('owner-hint').replaceChildren(
+  'Call it on ', el('span', { className: 'mono', textContent: NFT }), ' from its owner, the Safe ',
+  el('span', { className: 'mono', textContent: NFT_OWNER }),
+  planId === 'bitmap'
+    ? '. Until then the live metadata keeps the path-based images, and setting it back to the current base URL undoes the switch.'
+    : ', once you\'ve checked how marketplaces show web3:// metadata.',
+);
 
 // ---------- compiler info ----------
 

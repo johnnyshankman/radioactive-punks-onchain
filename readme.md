@@ -55,6 +55,8 @@ Deployment is modular and split across five main components:
 
 `RadioactivePunksImage` + `RadioactivePunksJSONV2`: an on-chain SVG `image` for every punk, and tokenJSON() that uses it instead of `animation_url` (see [image-renderer.md](image-renderer.md))
 
+`RadioactivePunksImageV2`: the same image drawn as two PNG bitmaps inside the SVG, so it has no seams between colors at any size. Not deployed yet; it reuses the deployed layer data (see [image-renderer.md](image-renderer.md#bitmap-images-radioactivepunksimagev2))
+
 `RadioactivePunksBytesHyperstructure`: the encoded trait data of every punk as bytes in groups of 15
 
 `RadioactivePunksSVGChunk1`: gzipped SVG layer data for all punks
