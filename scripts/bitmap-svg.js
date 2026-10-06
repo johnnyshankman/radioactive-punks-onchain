@@ -20,7 +20,8 @@
  *   bmp+bmp32    bmp8 base, 32-bit BMP (with alpha) glow
  *   png+png      RGB PNG base, RGBA PNG glow
  *   png8+png8    indexed PNGs (palette, one byte per pixel); the glow's
- *                palette starts with a transparent entry for empty cells
+ *                palette starts with a transparent entry for empty cells.
+ *                This is what RadioactivePunksImageV2 draws.
  *
  * Usage: node scripts/bitmap-svg.js <tokenId> [format]
  */
@@ -104,17 +105,19 @@ function png(cells, alpha = false) {
 const BMP = 'data:image/bmp;base64,';
 const PNG = 'data:image/png;base64,';
 // format -> [base encoder, glow encoder or null for glow paths]
-// indexed: PLTE holds the colors, tRNS makes null (palette entry 0, when
-// present) transparent
-function png8(cells) {
-  const palette = [...new Set(cells.flat())].sort((a, b) => (a === null ? -1 : b === null ? 1 : 0));
+// indexed: PLTE holds the colors in order of first appearance (row-major).
+// With `transparent`, palette entry 0 is reserved for null cells and tRNS
+// makes it transparent.
+function png8(cells, transparent = false) {
+  const colors = [...new Set(cells.flat().filter((c) => c !== null))];
+  const palette = transparent ? [null, ...colors] : colors;
   const raw = cells.flatMap((row) => [0, ...row.map((c) => palette.indexOf(c))]);
   const zlib = [0x78, 0x01, 0x01, ...u16le(raw.length), ...u16le(~raw.length & 0xffff), ...raw, ...u32be(adler32(raw))];
   return Buffer.from([
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
     ...chunk('IHDR', [...u32be(24), ...u32be(24), 8, 3, 0, 0, 0]),
     ...chunk('PLTE', palette.flatMap((c) => (c === null ? [0, 0, 0] : rgbOf(c)))),
-    ...(palette[0] === null ? chunk('tRNS', [0]) : []),
+    ...(transparent ? chunk('tRNS', [0]) : []),
     ...chunk('IDAT', zlib),
     ...chunk('IEND', []),
   ]);
@@ -126,7 +129,7 @@ const FORMATS = {
   'png+paths': [(c) => PNG + png(c).toString('base64'), null],
   'bmp+bmp32': [(c) => BMP + bmp8(c).toString('base64'), (c) => BMP + bmp32(c).toString('base64')],
   'png+png': [(c) => PNG + png(c).toString('base64'), (c) => PNG + png(c, true).toString('base64')],
-  'png8+png8': [(c) => PNG + png8(c).toString('base64'), (c) => PNG + png8(c).toString('base64')],
+  'png8+png8': [(c) => PNG + png8(c).toString('base64'), (c) => PNG + png8(c, true).toString('base64')],
 };
 
 const IMAGE = '<image width="24" height="24" image-rendering="optimizeSpeed" style="image-rendering:pixelated"';

@@ -25,6 +25,7 @@ const CONTRACTS = [
   'RadioactivePunksLayerData1',
   'RadioactivePunksLayerData2',
   'RadioactivePunksImage',
+  'RadioactivePunksImageV2',
   'RadioactivePunksJSONV2',
 ];
 
@@ -64,7 +65,7 @@ function main() {
     contracts[name] = entry;
   }
 
-  // one compile job built all four, so one Standard-JSON input verifies them all
+  // one compile job built them all, so one Standard-JSON input verifies them all
   const buildInfos = new Set(Object.values(loaded).map((l) => l.buildInfo.id));
   const { buildInfo } = loaded.RadioactivePunksImage;
 

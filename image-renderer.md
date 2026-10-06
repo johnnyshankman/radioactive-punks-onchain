@@ -119,7 +119,7 @@ Every punk gets a `#473682` purple background. The original renderer and the Arw
 
 The original art paints its background color in one place: each of the 10 one-of-ones starts with a full-canvas `#1f2e3d` rectangle (`M0 0h24v24H0z`). The packer skips exactly that rectangle, since the renderer draws its own background, so the one-of-ones get the purple background like every other punk. No other art uses `#1f2e3d`.
 
-Because the layers are flattened into a single grid, nothing overlaps. That also avoids the background seams that appear between stacked layers at fractional pixel sizes.
+Because the layers are flattened into a single grid, nothing overlaps, so there are no seams between stacked layers. There can still be seams between neighboring colors, though: see [Bitmap images](#bitmap-images-radioactivepunksimagev2).
 
 ### Dead punks
 
@@ -183,6 +183,8 @@ npm run deploy-page
 
 This does a clean compile, packages the tested bytecode for the page, and serves it at http://localhost:5173. Wallet extensions don't connect to pages opened straight from disk, so it needs the local server.
 
+The page has two tabs: **Full deploy**, the four steps below, and **Bitmap upgrade** (`?plan=bitmap`), the two steps in [Bitmap images](#bitmap-images-radioactivepunksimagev2). Each tab saves its progress separately.
+
 1. **Connect your wallet.** Wallets are found through EIP-6963, with Rainbow listed first. If you're not on mainnet, the page warns you and offers to switch.
 2. **Deploy each contract in order.** On mainnet, the trait data and original renderer addresses are pre-filled, and each step's address fills into the later steps automatically.
 3. **Check the deployment.** Render any punk through the new `RadioactivePunksJSONV2`, then copy the exact `setAPIBaseURL` value.
@@ -198,7 +200,7 @@ After each deploy:
 - The new contract's code is compared with the tested build, ignoring the constructor's address values.
 - Addresses and transactions are saved in your browser, per chain, so a reload doesn't lose progress.
 
-The page deploys bytecode from solc 0.8.20 with 200 optimizer runs and the default EVM version (Shanghai), the same build the tests run against. `scripts/build-deploy-page.js` refuses to package anything else. To verify the contracts on Etherscan, use those settings and the page's **Download Standard-JSON input** link, which covers all four contracts.
+The page deploys bytecode from solc 0.8.20 with 200 optimizer runs and the default EVM version (Shanghai), the same build the tests run against. `scripts/build-deploy-page.js` refuses to package anything else. To verify the contracts on Etherscan, use those settings and the page's **Download Standard-JSON input** link, which covers all five contracts, including `RadioactivePunksImageV2`.
 
 Files:
 
@@ -242,10 +244,98 @@ Checked after the switch:
 
 Marketplaces cache metadata, so they show the change after a metadata refresh. To switch back, call `setAPIBaseURL` with the previous Arweave base URL, `https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/`. That works as long as the contract isn't frozen; it isn't.
 
+## Bitmap images (`RadioactivePunksImageV2`)
+
+`RadioactivePunksImageV2` draws the same pixels as `RadioactivePunksImage`, but as two PNG bitmaps inside the SVG instead of one `<path>` per color. It's not deployed yet.
+
+### Why
+
+With one path per color, every shaded pixel is a hole in one path filled by another, like the darker ear lobe on red heads or the shading on the clown nose. At sizes that aren't a multiple of 24, a path's edge falls partway across a screen pixel. The renderer anti-aliases each path on its own, so two paths that each half-cover a pixel leave it partly transparent, and the purple background shows through as a thin dark line. `shape-rendering="crispEdges"` would prevent that, but Chrome ignores it when it draws an SVG loaded as an image, which is how wallets and marketplaces show it.
+
+A bitmap has no shape edges. Scaled with `image-rendering: pixelated`, every art pixel becomes a solid block.
+
+Measured in Chrome over 17 sample punks, counting pixels whose color isn't one of the punk's own (seams and blur):
+
+| Output | 50px | 97px | 177px | 301px |
+|---|---|---|---|---|
+| `RadioactivePunksImage` (paths) | 8,410 | 17,488 | 28,124 | 52,461 |
+| `RadioactivePunksImageV2` (bitmaps) | 0 | 0 | 0 | 0 |
+
+At an exact 10× scale the two are identical pixel for pixel.
+
+### Output
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><style>.g{animation:g 2s ease-in-out infinite alternate}@keyframes g{to{opacity:.4}}</style><image width="24" height="24" image-rendering="optimizeSpeed" style="image-rendering:pixelated" href="data:image/png;base64,..."/><image width="24" height="24" image-rendering="optimizeSpeed" style="image-rendering:pixelated" class="g" href="data:image/png;base64,..."/></svg>
+```
+
+- **Base image:** every cell, opaque. Empty cells and glow cells are the `#473682` background.
+- **Glow image:** only the glow cells, transparent everywhere else. It pulses exactly like the path version's glow, fading to 40% over the purple base and back. The first frame is at full opacity, so still snapshots look like the static art.
+- Both are 24×24 indexed PNGs: a palette in order of first appearance (the glow's starts with a transparent entry), and the pixels in a single uncompressed deflate block. The contract builds the CRC-32 and Adler-32 checksums itself.
+- `image-rendering="optimizeSpeed"` is for renderers that predate the CSS `pixelated` value. Without either, a renderer would scale the 24×24 bitmap smoothly and blur it.
+
+SVGs are 2.3 to 2.4 KB per punk, 2.3 KB on average, against 1.8 to 4.4 KB (2.8 KB on average) for the path version. The size barely varies because the bitmaps are the same size for every punk. Every punk has a glow, but if one didn't, its SVG would have only the base image and no style.
+
+The layer selection, stacking, data reads and trait lookups are copied unchanged from `RadioactivePunksImage`, and the interface is the same: `tokenSVG`, `tokenImage`, `traitBytes`, the same errors and constructor check. `RadioactivePunksImage.sol` is left as is, since its source is what's verified against the deployed contract.
+
+`scripts/bitmap-svg.js` is the JavaScript reference (`toBitmapSVG(grid, 'png8+png8')`), alongside the other formats that were tried. `node scripts/preview-bitmap.js` writes `preview/bitmap.html`, comparing the path version with each format at sizes that aren't multiples of 24.
+
+### Read gas
+
+| Call | Gas |
+|---|---|
+| `RadioactivePunksImageV2.tokenSVG` | 0.85M to 1.29M |
+| `RadioactivePunksImageV2.tokenImage` | 1.04M to 1.48M |
+
+That's about 0.4M more than `RadioactivePunksImage`, mostly the PNG checksums and base64-encoding the bitmaps. The pixel loop is in inline assembly like the rest of the hot paths. One-of-one #698 is the most expensive. It's still far below every `eth_call` cap.
+
+### Deploying
+
+Only two contracts are new. Everything else on mainnet is reused:
+
+| Contract | Address | |
+|---|---|---|
+| `RadioactivePunksBytesHyperstructure` | `0x60de3cd89bc8042a1cad6375fbcc11ea29c43e99` | reused: trait bytes |
+| `RadioactivePunksRenderer` | `0x5694010444cC8fbbed96c23a65FbC3714F624A26` | reused: trait names and values |
+| `RadioactivePunksLayerData1` | `0x43989D03dC1B2F6CBA55B7B21F3Ba7883d30162f` | reused: the art doesn't change |
+| `RadioactivePunksLayerData2` | `0xAB657a842266A9F5c3b18288BD27eb03da00c0F2` | reused |
+| `RadioactivePunksImageV2` | new | `(0x60de…3e99, 0x4398…162f, 0xAB65…c0F2)` |
+| `RadioactivePunksJSONV2` | new instance | `(0x5694…4A26, <RadioactivePunksImageV2>)` |
+
+A new `RadioactivePunksJSONV2` is needed because its image address is set once, in the constructor. It's the same source and bytecode as the live one, so nothing about the JSON changes except the image. The live `RadioactivePunksImage` and `RadioactivePunksJSONV2` stay deployed and keep working.
+
+1. `npm run deploy-page`, then open http://localhost:5173/?plan=bitmap (the **Bitmap upgrade** tab).
+2. Deploy `RadioactivePunksImageV2`. On mainnet the trait data and both layer data addresses are pre-filled, and the layer data fields are checked against the tested build.
+3. Deploy `RadioactivePunksJSONV2`. The original renderer is pre-filled and the image address fills in from step 2.
+4. Render a few punks with **Check the deployment**, then copy the base URL. It's `web3://<new RadioactivePunksJSONV2>/tokenJSON/string!`.
+5. From the owner Safe (`0x780Bf192F272e935985b614Db9Dee1027606b93c`), call `setAPIBaseURL` on the NFT contract (`0x073ca28e04719c05a5a48c1d992091b4075a0f84`) with that base URL.
+6. Refresh metadata on the marketplaces.
+
+To roll back, set the base URL back to `web3://0xC36C3b966e227F7a68C49512b4bdb4Ca7643c5c3/tokenJSON/string!`.
+
+The upgrade tab was run end to end against a local chain-1 node holding the real mainnet code of the trait data and both layer data contracts at their mainnet addresses:
+- The page's pre-filled addresses passed its checks.
+- Both deploys matched the tested build.
+- Check the deployment rendered punk #38 as valid JSON whose image held the two PNGs.
+
+Before the upgrade, a clean build was also compared with the live contracts: both layer data contracts, `RadioactivePunksImage` and `RadioactivePunksJSONV2` on mainnet still match it.
+
+Deploy gas, measured on a local network:
+
+| Contract | Gas |
+|---|---|
+| `RadioactivePunksImageV2` | 1,366,369 |
+| `RadioactivePunksJSONV2` | 703,387 |
+| **Total** | **2,069,756** |
+
+That's about a fifth of the original deploy, since no art is deployed again. At the gas prices of the first deploy (0.15 to 0.3 gwei), it costs well under 0.001 ETH.
+
+Before switching the base URL, check the bitmap output where it matters: in Safari and Firefox as well as Chrome, and in the marketplaces' thumbnails, which may rasterize SVGs with their own renderer. A renderer that supports neither `image-rendering` value would show a blurry punk.
+
 ## Testing
 
 ```
-npx hardhat test test/RadioactivePunksImageTest.js test/RadioactivePunksJSONV2Test.js
+npx hardhat test test/RadioactivePunksImageTest.js test/RadioactivePunksImageV2Test.js test/RadioactivePunksJSONV2Test.js
 ```
 
 Both suites deploy everything locally, including a copy of the trait data and of the original renderer for its getters.
@@ -255,6 +345,12 @@ Both suites deploy everything locally, including a copy of the trait data and of
 - Renders every one of the 1,614 punks and requires the SVG to be byte-for-byte identical to the JavaScript reference in `scripts/reference-svg.js`.
 - Checks that the data contracts hold exactly what the packer produces.
 - Checks trait bytes, the base64 data URI, nonexistent tokens, the constructor's traits check, and gas.
+
+**`RadioactivePunksImageV2Test.js`** (about 10 minutes):
+
+- Renders every one of the 1,614 punks and requires the SVG to be byte-for-byte identical to `toBitmapSVG(grid, 'png8+png8')` in `scripts/bitmap-svg.js`.
+- For 12 punks, including every one-of-one with its own glow color, decodes both PNGs independently (every chunk's CRC checked with Node's zlib, the pixels inflated) and requires them to hold exactly the punk's pixels: the base with background in empty and glow cells, the glow transparent everywhere else.
+- Checks that `RadioactivePunksJSONV2` serves its image, plus trait bytes, the data URI, nonexistent tokens, the constructor's traits check, and gas.
 
 **`RadioactivePunksJSONV2Test.js`** (about 1 minute):
 
