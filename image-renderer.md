@@ -26,13 +26,32 @@ The art already on-chain can't be used directly from Solidity. `RadioactivePunks
 |---|---|---|
 | `RadioactivePunksLayerData1` | 24.0 KB | Packed layer art, part 1 (generated) |
 | `RadioactivePunksLayerData2` | 17.5 KB | Packed layer art, part 2 (generated) |
-| `RadioactivePunksImage` | 4.1 KB | `tokenSVG(id)`, `tokenImage(id)`, `traitBytes(id)` |
+| `RadioactivePunksImage` | 4.4 KB | `tokenSVG(id)`, `tokenImage(id)`, `traitBytes(id)` |
 | `RadioactivePunksJSONV2` | 2.9 KB | `tokenJSON(uint256)`, `tokenJSON(string)` |
 
 Reused from the existing deployment (nothing to redeploy):
 
 - `RadioactivePunksBytesHyperstructure` (`0x60de3cd89bc8042a1cad6375fbcc11ea29c43e99`) for each punk's trait bytes.
 - `RadioactivePunksRenderer` (`0x5694010444cC8fbbed96c23a65FbC3714F624A26`) for trait names and values, through its public getters (`TRAIT_NAMES`, `HEAD`, `EYES`, ...). Its expensive `tokenURI` is never called.
+
+## Mainnet deployment
+
+| Contract | Address | Deploy tx | Gas | Cost |
+|---|---|---|---|---|
+| `RadioactivePunksLayerData1` | [`0x43989D03dC1B2F6CBA55B7B21F3Ba7883d30162f`](https://etherscan.io/address/0x43989D03dC1B2F6CBA55B7B21F3Ba7883d30162f) | [`0x624d…e7bc`](https://etherscan.io/tx/0x624dbbf15c3226f41295348ff7fee71e3d3c55a519d6af4a84a186bdcb25e7bc) | 5,238,855 | 0.000817 ETH at 0.156 gwei |
+| `RadioactivePunksLayerData2` | [`0xAB657a842266A9F5c3b18288BD27eb03da00c0F2`](https://etherscan.io/address/0xAB657a842266A9F5c3b18288BD27eb03da00c0F2) | [`0x96f9…279e`](https://etherscan.io/tx/0x96f9a31529362f810e1a2b4d5237bc965a715513a6509dcfa463c224f6dd279e) | 3,833,302 | 0.000675 ETH at 0.176 gwei |
+| `RadioactivePunksImage` | [`0x91Bb63799C7eb09a2b54dBA4b745E7452eE7bc73`](https://etherscan.io/address/0x91Bb63799C7eb09a2b54dBA4b745E7452eE7bc73) | [`0xd7cd…ac00`](https://etherscan.io/tx/0xd7cdec82416375863d5c67d5a04a33d53cab8be23cf58fdffd2ea47bd705ac00) | 1,037,238 | 0.000302 ETH at 0.291 gwei |
+| `RadioactivePunksJSONV2` | [`0xC36C3b966e227F7a68C49512b4bdb4Ca7643c5c3`](https://etherscan.io/address/0xC36C3b966e227F7a68C49512b4bdb4Ca7643c5c3) | [`0xdfd5…ed81`](https://etherscan.io/tx/0xdfd523511345adbed9f6374019ba8ffc884ec4a3c28353c8e196a237649aed81) | 703,387 | 0.000146 ETH at 0.207 gwei |
+| **Total** | | | **10,812,782** | **0.001940 ETH** (about $5.24 at $2,700) |
+
+All four were deployed with the deploy page from this repo's build (solc 0.8.20, 200 optimizer runs). After deploying, each was checked on-chain:
+
+- Each transaction's creation bytecode is the repo build, and each contract's deployed code matches it. The two layer data contracts together hold exactly the packed layer data.
+- The constructor arguments are the expected addresses: `RadioactivePunksImage(0x60de…3E99, 0x4398…162f, 0xAB65…c0F2)` and `RadioactivePunksJSONV2(0x5694…4A26, 0x91Bb…bc73)`.
+- 36 punks rendered by the live `RadioactivePunksImage`, including all 10 one-of-ones and dead punks, are byte-for-byte identical to `scripts/reference-svg.js`, with the glow animation.
+- For 10 punks, the live `RadioactivePunksJSONV2.tokenJSON` equals the live `RadioactivePunksJSON` output with `animation_url` replaced by `image`. `tokenJSON("516.json")` equals `tokenJSON(516)`, and malformed paths revert.
+
+`RadioactivePunksJSON` (`0x5d0CfA6F4F7F0690505dEF6D55EB16cA73f9f134`) is still deployed and still serves the `animation_url` version.
 
 ### `RadioactivePunksImage`
 
@@ -193,9 +212,9 @@ Measured deploy gas, priced at 0.078 gwei and $2,700 per ETH:
 |---|---|---|---|
 | `RadioactivePunksLayerData1` | 5,238,855 | 0.000409 | $1.10 |
 | `RadioactivePunksLayerData2` | 3,833,302 | 0.000299 | $0.81 |
-| `RadioactivePunksImage` | 976,906 | 0.000076 | $0.21 |
+| `RadioactivePunksImage` | 1,037,238 | 0.000081 | $0.22 |
 | `RadioactivePunksJSONV2` | 703,387 | 0.000055 | $0.15 |
-| **Total** | **10,752,450** | **0.000839** | **$2.26** |
+| **Total** | **10,812,782** | **0.000843** | **$2.28** |
 
 - Nearly all of the cost is the 200 gas per byte of deployed code for the 41.5 KB of art.
 - The EIP-7623 calldata floor doesn't apply to any of these deploys.
@@ -205,7 +224,7 @@ Measured deploy gas, priced at 0.078 gwei and $2,700 per ETH:
 To point the original contract at it, call `setAPIBaseURL` on `0x073ca28e04719c05a5a48c1d992091b4075a0f84` from its owner with:
 
 ```
-web3://<RadioactivePunksJSONV2 address>/tokenJSON/string!
+web3://0xC36C3b966e227F7a68C49512b4bdb4Ca7643c5c3/tokenJSON/string!
 ```
 
 Check how OpenSea and other marketplaces display `web3://` metadata before doing this on mainnet. The base URL can be changed back as long as the contract isn't frozen. The current Arweave base URL is `https://arweave.net/it_O6PjeIBWhQUg2TdGTf5vtCZvGcyOcxvkVYgKuNBQ/`.

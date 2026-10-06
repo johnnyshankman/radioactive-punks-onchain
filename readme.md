@@ -51,7 +51,7 @@ Deployment is modular and split across five main components:
 
 `RadioactivePunksJSON`: responsible for producing ERC-4804 compliant NFT tokenJSON() (to use as response of web3:// URLs)
 
-`RadioactivePunksImage` + `RadioactivePunksJSONV2`: an on-chain static SVG `image` for every punk, and tokenJSON() that uses it instead of `animation_url` (not yet deployed, see [image-renderer.md](image-renderer.md))
+`RadioactivePunksImage` + `RadioactivePunksJSONV2`: an on-chain SVG `image` for every punk, and tokenJSON() that uses it instead of `animation_url` (see [image-renderer.md](image-renderer.md))
 
 `RadioactivePunksBytesHyperstructure`: the encoded trait data of every punk as bytes in groups of 15
 
@@ -89,6 +89,30 @@ Approximately `0.44560054 Ether` for all original contracts combined.
 ### RadioactivePunksJSON.sol
 * New wrapper to support ERC-4804 tokenJSON
 * https://etherscan.io/tx/0x03caec478fa74e2d87e9383d39623b68662445580ef522e4f164298ffe47b8a1
+
+### RadioactivePunksLayerData1.sol
+* Packed layer art for the on-chain image renderer, part 1
+* 0.156 gwei
+* 0.000817 ETH
+* https://etherscan.io/tx/0x624dbbf15c3226f41295348ff7fee71e3d3c55a519d6af4a84a186bdcb25e7bc
+
+### RadioactivePunksLayerData2.sol
+* Packed layer art for the on-chain image renderer, part 2
+* 0.176 gwei
+* 0.000675 ETH
+* https://etherscan.io/tx/0x96f9a31529362f810e1a2b4d5237bc965a715513a6509dcfa463c224f6dd279e
+
+### RadioactivePunksImage.sol
+* On-chain SVG image renderer, with a pulsing radioactive glow
+* 0.291 gwei
+* 0.000302 ETH
+* https://etherscan.io/tx/0xd7cdec82416375863d5c67d5a04a33d53cab8be23cf58fdffd2ea47bd705ac00
+
+### RadioactivePunksJSONV2.sol
+* ERC-4804 tokenJSON with the on-chain `image` instead of `animation_url`
+* 0.207 gwei
+* 0.000146 ETH
+* https://etherscan.io/tx/0xdfd523511345adbed9f6374019ba8ffc884ec4a3c28353c8e196a237649aed81
 
 ### RadioactivePunksSVGChunk1.sol
 * 19.27 gwei
