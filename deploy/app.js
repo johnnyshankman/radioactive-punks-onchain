@@ -15,7 +15,7 @@ import { COMPILER, CONTRACTS } from './contracts.js';
 // existing mainnet contracts the new ones read from
 const MAINNET_TRAITS = '0x60de3cd89bc8042a1cad6375fbcc11ea29c43e99';
 const MAINNET_RENDERER = '0x5694010444cC8fbbed96c23a65FbC3714F624A26';
-// deployed by the full plan below, reused by the bitmap upgrade
+// deployed by the full plan below, reused by the V3 upgrade
 const MAINNET_LAYER_DATA_1 = '0x43989D03dC1B2F6CBA55B7B21F3Ba7883d30162f';
 const MAINNET_LAYER_DATA_2 = '0xAB657a842266A9F5c3b18288BD27eb03da00c0F2';
 const NFT = '0x073ca28e04719c05a5a48c1d992091b4075a0f84';
@@ -59,12 +59,12 @@ const FULL_STEPS = [
   },
 ];
 
-const BITMAP_STEPS = [
+const V3_STEPS = [
   {
     id: 'image',
-    contract: 'RadioactivePunksImageV2',
-    title: '1. Bitmap image renderer',
-    description: 'Renders each punk as an SVG wrapping two PNGs. Reads the existing trait data and the already deployed layer data, so no art is deployed again.',
+    contract: 'RadioactivePunksImageV3',
+    title: '1. Image renderer V3',
+    description: 'Renders each punk as the current SVG paths with the same pixels as sharp PNG bitmaps on top. Reads the existing trait data and the already deployed layer data, so no art is deployed again.',
     params: [
       { name: 'traits', label: 'Trait data (RadioactivePunksBytesHyperstructure)', mainnetDefault: MAINNET_TRAITS, check: 'code' },
       { name: 'layerData1', label: 'Layer data, part 1 (already deployed)', mainnetDefault: MAINNET_LAYER_DATA_1, check: 'RadioactivePunksLayerData1' },
@@ -75,10 +75,10 @@ const BITMAP_STEPS = [
     id: 'json',
     contract: 'RadioactivePunksJSONV2',
     title: '2. JSON metadata',
-    description: 'A new instance of the same RadioactivePunksJSONV2, pointing at the bitmap image renderer. The live one keeps serving the path-based images until the base URL changes.',
+    description: 'A new instance of the same RadioactivePunksJSONV2, pointing at image renderer V3. The live one keeps serving the current images until the base URL changes.',
     params: [
       { name: 'renderer', label: 'Original renderer (RadioactivePunksRenderer)', mainnetDefault: MAINNET_RENDERER, check: 'code' },
-      { name: 'image', label: 'Bitmap image renderer', from: 'image', check: 'RadioactivePunksImageV2' },
+      { name: 'image', label: 'Image renderer V3', from: 'image', check: 'RadioactivePunksImageV3' },
     ],
   },
 ];
@@ -91,16 +91,16 @@ const PLANS = {
     image: 'RadioactivePunksImage',
     steps: FULL_STEPS,
   },
-  bitmap: {
-    title: 'Upgrade to bitmap images',
-    intro: 'Deploys the two contracts that switch the on-chain image from SVG paths to PNG bitmaps, which have no seams at any size. The layer data, trait data and original renderer already on mainnet are reused. The bytecode is exactly what the test suite ran against.',
-    storage: 'rpunks-image-v2-deploy',
-    image: 'RadioactivePunksImageV2',
-    steps: BITMAP_STEPS,
+  v3: {
+    title: 'Upgrade to image renderer V3',
+    intro: 'Deploys the two contracts that switch the on-chain image to V3: the current SVG paths with sharp PNG bitmaps on top, so Chrome and Safari show no seams between colors at any size. The layer data, trait data and original renderer already on mainnet are reused. The bytecode is exactly what the test suite ran against.',
+    storage: 'rpunks-image-v3-deploy',
+    image: 'RadioactivePunksImageV3',
+    steps: V3_STEPS,
   },
 };
 
-const planId = new URLSearchParams(location.search).get('plan') === 'bitmap' ? 'bitmap' : 'full';
+const planId = new URLSearchParams(location.search).get('plan') === 'v3' ? 'v3' : 'full';
 const PLAN = PLANS[planId];
 const STEPS = PLAN.steps;
 
@@ -455,7 +455,7 @@ for (const a of document.querySelectorAll('[data-plan]')) {
 $('owner-hint').replaceChildren(
   'Call it on ', el('span', { className: 'mono', textContent: NFT }), ' from its owner, the Safe ',
   el('span', { className: 'mono', textContent: NFT_OWNER }),
-  planId === 'bitmap'
+  planId === 'v3'
     ? '. Until then the live metadata keeps the path-based images, and setting it back to the current base URL undoes the switch.'
     : ', once you\'ve checked how marketplaces show web3:// metadata.',
 );

@@ -183,7 +183,7 @@ npm run deploy-page
 
 This does a clean compile, packages the tested bytecode for the page, and serves it at http://localhost:5173. Wallet extensions don't connect to pages opened straight from disk, so it needs the local server.
 
-The page has two tabs: **Full deploy**, the four steps below, and **Bitmap upgrade** (`?plan=bitmap`), the two steps in [Bitmap images](#bitmap-images-radioactivepunksimagev2). Each tab saves its progress separately.
+The page has two tabs: **Full deploy**, the four steps below, and **V3 upgrade** (`?plan=v3`), the two steps in [Image renderer V3](#image-renderer-v3-radioactivepunksimagev3). Each tab saves its progress separately.
 
 1. **Connect your wallet.** Wallets are found through EIP-6963, with Rainbow listed first. If you're not on mainnet, the page warns you and offers to switch.
 2. **Deploy each contract in order.** On mainnet, the trait data and original renderer addresses are pre-filled, and each step's address fills into the later steps automatically.
@@ -246,7 +246,7 @@ Marketplaces cache metadata, so they show the change after a metadata refresh. T
 
 ## Bitmap images (`RadioactivePunksImageV2`)
 
-`RadioactivePunksImageV2` draws the same pixels as `RadioactivePunksImage`, but as two PNG bitmaps inside the SVG instead of one `<path>` per color. It's deployed on mainnet with its own `RadioactivePunksJSONV2`, but the NFT contract's base URL still points at the path-based JSON (see [Mainnet deployment](#mainnet-deployment-1)).
+`RadioactivePunksImageV2` draws the same pixels as `RadioactivePunksImage`, but as two PNG bitmaps inside the SVG instead of one `<path>` per color. It's deployed on mainnet with its own `RadioactivePunksJSONV2` (see [Mainnet deployment](#mainnet-deployment-1)), but nothing points at it: Safari blurs it, so [V3](#image-renderer-v3-radioactivepunksimagev3) replaces it.
 
 ### Why
 
@@ -304,7 +304,7 @@ Only two contracts are new. Everything else on mainnet is reused:
 
 A new `RadioactivePunksJSONV2` is needed because its image address is set once, in the constructor. It's the same source and bytecode as the live one, so nothing about the JSON changes except the image. The live `RadioactivePunksImage` and `RadioactivePunksJSONV2` stay deployed and keep working.
 
-1. `npm run deploy-page`, then open http://localhost:5173/?plan=bitmap (the **Bitmap upgrade** tab).
+1. `npm run deploy-page`, then open the **Bitmap upgrade** tab. It has since been replaced by the V3 upgrade tab.
 2. Deploy `RadioactivePunksImageV2`. On mainnet the trait data and both layer data addresses are pre-filled, and the layer data fields are checked against the tested build.
 3. Deploy `RadioactivePunksJSONV2`. The original renderer is pre-filled and the image address fills in from step 2.
 4. Render a few punks with **Check the deployment**, then copy the base URL. It's `web3://<new RadioactivePunksJSONV2>/tokenJSON/string!`.
@@ -346,18 +346,99 @@ Both were deployed with the deploy page's Bitmap upgrade tab (solc 0.8.20, 200 o
 
 The page first reported the image renderer as not matching the build. That was a false alarm: right after the receipt, the wallet's node returned no code for the new address. The page now reads the code at the receipt's block and retries.
 
-To switch the NFT contract to bitmap images, the owner Safe calls `setAPIBaseURL` with:
+The NFT contract was never pointed at it. Checked before switching, the bitmaps turned out blurry everywhere but Chrome:
 
-```
-web3://0xB7ca6E7905641b0b49E5F6a5c9f1C527AC1cd4e7/tokenJSON/string!
+- Safari ignores `image-rendering` on SVG `<image>`s and smooths them. That includes every browser on iPhone, since they all use WebKit.
+- Headless renderers smooth them too: resvg and macOS Quick Look (WebKit). ImageMagick can't load the embedded PNGs at all.
+- The same renderers keep the path-based SVG crisp. The seams are mostly Chrome's.
+
+## Image renderer V3 (`RadioactivePunksImageV3`)
+
+`RadioactivePunksImageV3` draws exactly the SVG `RadioactivePunksImage` draws, then the same pixels on top as V2's two PNGs, in HTML `<img>`s inside `<foreignObject>`s. It's not deployed yet.
+
+### Why
+
+Each kind of renderer gets the version it draws best:
+
+- **Browsers** draw the HTML bitmaps. Safari ignores `image-rendering` on SVG `<image>`s but honors it on HTML `<img>`s, so they're sharp there as well as in Chrome, with no seams.
+- **Renderers without `foreignObject` support** skip the bitmaps and draw the paths, which they keep crisp.
+
+Off-color pixels (seams and blur) for 3 punks at 177px, or for Chrome 17 punks at each size:
+
+| Renderer | `RadioactivePunksImage` (paths) | V2 (bitmaps) | V3 |
+|---|---|---|---|
+| Chrome, 50 / 97 / 177 / 301px | 8,410 / 17,488 / 28,124 / 52,461 | 0 / 0 / 0 / 0 | **0 / 0 / 0 / 0** |
+| Safari | thin seams | blurry | **sharp** (checked by eye) |
+| resvg | 0 | 49,932 | **0** |
+| macOS Quick Look (WebKit) | 0 | 38,082 | **0** |
+| ImageMagick | 23,376 | can't load the PNGs | **23,376** (draws the paths) |
+
+At an exact 10× scale, V3 in Chrome is identical pixel for pixel to `RadioactivePunksImage`. Firefox hasn't been checked yet.
+
+### Output
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges"><style>.g,[fill="#7cff2f"],...{animation:g 2s ease-in-out infinite alternate}@keyframes g{to{opacity:.4}}img{display:block;width:24px;height:24px;image-rendering:pixelated}</style><rect width="24" height="24" fill="#473682"/><path fill="#7cff2f" d="M5 2h3v1h-3z..."/>...<foreignObject width="24" height="24"><img xmlns="http://www.w3.org/1999/xhtml" src="data:image/png;base64,..."/></foreignObject><foreignObject width="24" height="24" class="g"><img xmlns="http://www.w3.org/1999/xhtml" src="data:image/png;base64,..."/></foreignObject></svg>
 ```
 
-Before switching the base URL, check the bitmap output where it matters: in Safari and Firefox as well as Chrome, and in the marketplaces' thumbnails, which may rasterize SVGs with their own renderer. A renderer that supports neither `image-rendering` value would show a blurry punk.
+- Everything up to the `<foreignObject>`s is `RadioactivePunksImage`'s SVG, with two additions to the style: `.g` joins the glow selectors, and the `img` rule sizes the bitmaps.
+- The PNGs are V2's: the opaque base, then the glow cells on a transparent image.
+- The glow bitmap pulses with the glow paths, through the `g` class on its `<foreignObject>`. It can't be on the `<img>`: Safari draws an animated HTML element inside a `<foreignObject>` at its unscaled size, a tiny copy in the top-left corner.
+- The `<img>`s aren't positioned: Safari has the same bug for `position: absolute` inside a `<foreignObject>`. Each sits in its own `<foreignObject>` instead.
+
+SVGs are 4.0 to 6.7 KB per punk, 5.0 KB on average.
+
+The code is `RadioactivePunksImage`'s, with `RadioactivePunksImageV2`'s PNG building added: same data reads, layer selection, path writing and interface (`tokenSVG`, `tokenImage`, `traitBytes`, the same errors and constructor check). The reference is `toBitmapSVG(grid, 'paths+html')` in `scripts/bitmap-svg.js`, and `node scripts/preview-bitmap.js` compares it with the other formats.
+
+### Read gas
+
+Measured for punks #0, #6, #38, #100, #698, #1000, #1665 and #2999:
+
+| Call | Gas |
+|---|---|
+| `RadioactivePunksImageV3.tokenSVG` | 1.05M to 1.58M |
+| `RadioactivePunksImageV3.tokenImage` | 1.39M to 1.96M |
+
+It draws both the paths and the bitmaps, so it costs about as much as `RadioactivePunksImage` and V2's PNG work together. It's still far below every `eth_call` cap.
+
+### Deploying
+
+Same as V2: only the image contract and a new `RadioactivePunksJSONV2` instance are new.
+
+| Contract | Address | |
+|---|---|---|
+| `RadioactivePunksBytesHyperstructure` | `0x60de3cd89bc8042a1cad6375fbcc11ea29c43e99` | reused |
+| `RadioactivePunksRenderer` | `0x5694010444cC8fbbed96c23a65FbC3714F624A26` | reused |
+| `RadioactivePunksLayerData1` | `0x43989D03dC1B2F6CBA55B7B21F3Ba7883d30162f` | reused |
+| `RadioactivePunksLayerData2` | `0xAB657a842266A9F5c3b18288BD27eb03da00c0F2` | reused |
+| `RadioactivePunksImageV3` | new | `(0x60de…3e99, 0x4398…162f, 0xAB65…c0F2)` |
+| `RadioactivePunksJSONV2` | new instance | `(0x5694…4A26, <RadioactivePunksImageV3>)` |
+
+1. `npm run deploy-page`, then open http://localhost:5173/?plan=v3 (the **V3 upgrade** tab).
+2. Deploy `RadioactivePunksImageV3`. On mainnet the trait data and both layer data addresses are pre-filled, and the layer data fields are checked against the tested build.
+3. Deploy `RadioactivePunksJSONV2`. The original renderer is pre-filled and the image address fills in from step 2.
+4. Render a few punks with **Check the deployment**, then copy the base URL. It's `web3://<new RadioactivePunksJSONV2>/tokenJSON/string!`.
+5. From the owner Safe (`0x780Bf192F272e935985b614Db9Dee1027606b93c`), call `setAPIBaseURL` on the NFT contract (`0x073ca28e04719c05a5a48c1d992091b4075a0f84`) with that base URL.
+6. Refresh metadata on the marketplaces.
+
+To roll back, set the base URL back to `web3://0xC36C3b966e227F7a68C49512b4bdb4Ca7643c5c3/tokenJSON/string!`.
+
+Deploy gas, measured on a local network:
+
+| Contract | Gas |
+|---|---|
+| `RadioactivePunksImageV3` | 1,590,019 |
+| `RadioactivePunksJSONV2` | 703,387 |
+| **Total** | **2,293,406** |
+
+At the 0.066 to 0.068 gwei V2 was deployed at, that's about 0.00015 ETH.
+
+Before switching the base URL, check V3 in Firefox and on an iPhone, and on the marketplaces after the switch.
 
 ## Testing
 
 ```
-npx hardhat test test/RadioactivePunksImageTest.js test/RadioactivePunksImageV2Test.js test/RadioactivePunksJSONV2Test.js
+npx hardhat test test/RadioactivePunksImageTest.js test/RadioactivePunksImageV2Test.js test/RadioactivePunksImageV3Test.js test/RadioactivePunksJSONV2Test.js
 ```
 
 Both suites deploy everything locally, including a copy of the trait data and of the original renderer for its getters.
@@ -372,6 +453,13 @@ Both suites deploy everything locally, including a copy of the trait data and of
 
 - Renders every one of the 1,614 punks and requires the SVG to be byte-for-byte identical to `toBitmapSVG(grid, 'png8+png8')` in `scripts/bitmap-svg.js`.
 - For 12 punks, including every one-of-one with its own glow color, decodes both PNGs independently (every chunk's CRC checked with Node's zlib, the pixels inflated) and requires them to hold exactly the punk's pixels: the base with background in empty and glow cells, the glow transparent everywhere else.
+- Checks that `RadioactivePunksJSONV2` serves its image, plus trait bytes, the data URI, nonexistent tokens, the constructor's traits check, and gas.
+
+**`RadioactivePunksImageV3Test.js`** (about 13 minutes):
+
+- Renders every one of the 1,614 punks and requires the SVG to be byte-for-byte identical to `toBitmapSVG(grid, 'paths+html')` in `scripts/bitmap-svg.js`.
+- For 9 punks, requires the SVG minus the bitmaps (and the two style additions) to be exactly `RadioactivePunksImage`'s, from `scripts/reference-svg.js`.
+- Decodes both PNGs for 12 punks, as for V2.
 - Checks that `RadioactivePunksJSONV2` serves its image, plus trait bytes, the data URI, nonexistent tokens, the constructor's traits check, and gas.
 
 **`RadioactivePunksJSONV2Test.js`** (about 1 minute):

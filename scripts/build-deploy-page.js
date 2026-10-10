@@ -26,6 +26,7 @@ const CONTRACTS = [
   'RadioactivePunksLayerData2',
   'RadioactivePunksImage',
   'RadioactivePunksImageV2',
+  'RadioactivePunksImageV3',
   'RadioactivePunksJSONV2',
 ];
 
