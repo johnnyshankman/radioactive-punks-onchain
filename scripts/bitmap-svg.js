@@ -22,10 +22,19 @@
  *   png8+png8    indexed PNGs (palette, one byte per pixel); the glow's
  *                palette starts with a transparent entry for empty cells.
  *                This is what RadioactivePunksImageV2 draws.
+ *   paths+html   the path-based SVG RadioactivePunksImage draws, with the
+ *                two PNGs as HTML <img>s on top, each in its own
+ *                <foreignObject>. Safari ignores image-rendering on SVG
+ *                <image>s and blurs every format above, but honors it on
+ *                HTML <img>s. Browsers draw the bitmaps, sharp;
+ *                renderers without foreignObject support draw the paths,
+ *                which they keep crisp. The glow pulses by animating its
+ *                <foreignObject>: Safari draws an animated HTML element
+ *                inside a foreignObject at its unscaled size, in the corner.
  *
  * Usage: node scripts/bitmap-svg.js <tokenId> [format]
  */
-const { createReference, BG, GLOW_COLORS, GLOW_STYLE } = require('./reference-svg');
+const { createReference, toSVG, BG, GLOW_COLORS, GLOW_STYLE } = require('./reference-svg');
 
 const u16le = (n) => [n & 255, (n >> 8) & 255];
 const u32le = (n) => [n & 255, (n >> 8) & 255, (n >> 16) & 255, (n >>> 24) & 255];
@@ -104,7 +113,7 @@ function png(cells, alpha = false) {
 
 const BMP = 'data:image/bmp;base64,';
 const PNG = 'data:image/png;base64,';
-// format -> [base encoder, glow encoder or null for glow paths]
+
 // indexed: PLTE holds the colors in order of first appearance (row-major).
 // With `transparent`, palette entry 0 is reserved for null cells and tRNS
 // makes it transparent.
@@ -123,6 +132,7 @@ function png8(cells, transparent = false) {
   ]);
 }
 
+// format -> [base encoder, glow encoder or null for glow paths]
 const FORMATS = {
   'bmp8+paths': [(c) => BMP + bmp8(c).toString('base64'), null],
   'bmp24+paths': [(c) => BMP + bmp24(c).toString('base64'), null],
@@ -130,21 +140,39 @@ const FORMATS = {
   'bmp+bmp32': [(c) => BMP + bmp8(c).toString('base64'), (c) => BMP + bmp32(c).toString('base64')],
   'png+png': [(c) => PNG + png(c).toString('base64'), (c) => PNG + png(c, true).toString('base64')],
   'png8+png8': [(c) => PNG + png8(c).toString('base64'), (c) => PNG + png8(c, true).toString('base64')],
+  'paths+html': [],
 };
 
 const IMAGE = '<image width="24" height="24" image-rendering="optimizeSpeed" style="image-rendering:pixelated"';
 const IMAGE_GLOW_STYLE = '<style>.g{animation:g 2s ease-in-out infinite alternate}@keyframes g{to{opacity:.4}}</style>';
 
+function toPathsWithHTMLSVG(grid) {
+  const isGlow = (c) => GLOW_COLORS.includes(c);
+  const png = (cells, transparent) => PNG + png8(cells, transparent).toString('base64');
+  const baseHref = png(grid.map((row) => row.map((c) => (c === null || isGlow(c) ? BG : c))));
+  const glowCells = grid.map((row) => row.map((c) => (isGlow(c) ? c : null)));
+  const glowHref = glowCells.flat().some((c) => c) ? png(glowCells, true) : null;
+  // the paths' glow style also pulses the glow image's foreignObject
+  const style = GLOW_STYLE.replace('<style>', '<style>.g,')
+    .replace('</style>', 'img{display:block;width:24px;height:24px;image-rendering:pixelated}</style>');
+  const layer = (href, attrs = '') => `<foreignObject width="24" height="24"${attrs}><img xmlns="http://www.w3.org/1999/xhtml" src="${href}"/></foreignObject>`;
+  const html = layer(baseHref) + (glowHref ? layer(glowHref, ' class="g"') : '');
+  return toSVG(grid).replace(GLOW_STYLE, style).replace('</svg>', `${html}</svg>`);
+}
+
 function toBitmapSVG(grid, format = 'bmp8+paths') {
+  if (format === 'paths+html') return toPathsWithHTMLSVG(grid);
   const [encodeBase, encodeGlow] = FORMATS[format];
   const isGlow = (c) => GLOW_COLORS.includes(c);
-  const base = `${IMAGE} href="${encodeBase(grid.map((row) => row.map((c) => (c === null || isGlow(c) ? BG : c))))}"/>`;
+  const baseHref = encodeBase(grid.map((row) => row.map((c) => (c === null || isGlow(c) ? BG : c))));
+  const base = `${IMAGE} href="${baseHref}"/>`;
 
   if (encodeGlow) {
     const glowCells = grid.map((row) => row.map((c) => (isGlow(c) ? c : null)));
-    if (!glowCells.flat().some((c) => c)) return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${base}</svg>`;
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${IMAGE_GLOW_STYLE}${base}`
-      + `${IMAGE} class="g" href="${encodeGlow(glowCells)}"/></svg>`;
+    const glowHref = glowCells.flat().some((c) => c) ? encodeGlow(glowCells) : null;
+    const glow = glowHref ? `${IMAGE} class="g" href="${glowHref}"/>` : '';
+    if (!glowHref) return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${base}</svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${IMAGE_GLOW_STYLE}${base}${glow}</svg>`;
   }
 
   const glow = new Map();

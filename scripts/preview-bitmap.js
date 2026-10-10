@@ -63,7 +63,7 @@ function page(cards) {
 </head>
 <body style="--size: 133px">
 <h1>Bitmap prototype</h1>
-<p>"paths" is the current RadioactivePunksImage output. The others wrap a 24x24 bitmap, with the glow drawn on top either as paths or as a second, transparent bitmap. Sizes are deliberately not multiples of 24. Look for purple lines at the ear lobe and clown nose, and for blur.</p>
+<p>"paths" is the live RadioactivePunksImage output, "png8+png8" the deployed RadioactivePunksImageV2. "paths+html" draws the bitmaps as HTML images over the paths. See scripts/bitmap-svg.js for each format. Sizes are deliberately not multiples of 24. Look for purple lines at the ear lobe and clown nose, and for blur.</p>
 <div class="controls">
   ${sizes.map((s) => `<button data-size="${s}" aria-pressed="${s === 133}">${s}px</button>`).join('')}
   <label>custom <input id="custom" type="range" min="24" max="480" value="133"><span id="customValue">133</span></label>
@@ -97,7 +97,7 @@ function main() {
     const variants = [['paths', ref.tokenSVG(id)], ...Object.keys(FORMATS).map((f) => [f, toBitmapSVG(grid, f)])];
     return `<div class="card"><h2>#${id} <span>${label}</span></h2><div class="row">${variants.map(([name, svg]) => {
       (totals[name] = totals[name] || []).push(svg.length);
-      return `<figure><img src="${dataURI(svg)}" data-pulse="${dataURI(svg)}" data-static="${dataURI(svg.replace(/<style>.*?<\/style>/, ''))}" alt="Punk #${id}, ${name}">${name} · ${svg.length} B</figure>`;
+      return `<figure><img src="${dataURI(svg)}" data-pulse="${dataURI(svg)}" data-static="${dataURI(svg.replace(/animation:g [^;}]*/, 'animation:none'))}" alt="Punk #${id}, ${name}">${name} · ${svg.length} B</figure>`;
     }).join('')}</div></div>`;
   });
 

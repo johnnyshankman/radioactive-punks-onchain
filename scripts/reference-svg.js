@@ -101,7 +101,7 @@ function createReference() {
   };
 }
 
-module.exports = { createReference, layerIds, BG, GLOW_COLORS, GLOW_STYLE };
+module.exports = { createReference, layerIds, toSVG, BG, GLOW_COLORS, GLOW_STYLE };
 
 if (require.main === module) {
   console.log(createReference().tokenSVG(Number(process.argv[2] || 0)));
