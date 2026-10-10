@@ -55,7 +55,7 @@ Deployment is modular and split across five main components:
 
 `RadioactivePunksImage` + `RadioactivePunksJSONV2`: an on-chain SVG `image` for every punk, and tokenJSON() that uses it instead of `animation_url` (see [image-renderer.md](image-renderer.md))
 
-`RadioactivePunksImageV2`: the same image drawn as two PNG bitmaps inside the SVG, so it has no seams between colors at any size. Not deployed yet; it reuses the deployed layer data (see [image-renderer.md](image-renderer.md#bitmap-images-radioactivepunksimagev2))
+`RadioactivePunksImageV2`: the same image drawn as two PNG bitmaps inside the SVG, so it has no seams between colors at any size. Deployed at `0x3b23042cC1E018914B315cAeC2801D357cE5B36e` with its own `RadioactivePunksJSONV2` at `0xB7ca6E7905641b0b49E5F6a5c9f1C527AC1cd4e7`, reusing the deployed layer data. The NFT's base URL doesn't point at it yet (see [image-renderer.md](image-renderer.md#bitmap-images-radioactivepunksimagev2))
 
 `RadioactivePunksBytesHyperstructure`: the encoded trait data of every punk as bytes in groups of 15
 

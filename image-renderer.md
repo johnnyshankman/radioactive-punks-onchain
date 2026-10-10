@@ -246,7 +246,7 @@ Marketplaces cache metadata, so they show the change after a metadata refresh. T
 
 ## Bitmap images (`RadioactivePunksImageV2`)
 
-`RadioactivePunksImageV2` draws the same pixels as `RadioactivePunksImage`, but as two PNG bitmaps inside the SVG instead of one `<path>` per color. It's not deployed yet.
+`RadioactivePunksImageV2` draws the same pixels as `RadioactivePunksImage`, but as two PNG bitmaps inside the SVG instead of one `<path>` per color. It's deployed on mainnet with its own `RadioactivePunksJSONV2`, but the NFT contract's base URL still points at the path-based JSON (see [Mainnet deployment](#mainnet-deployment-1)).
 
 ### Why
 
@@ -329,6 +329,28 @@ Deploy gas, measured on a local network:
 | **Total** | **2,069,756** |
 
 That's about a fifth of the original deploy, since no art is deployed again. At the gas prices of the first deploy (0.15 to 0.3 gwei), it costs well under 0.001 ETH.
+
+### Mainnet deployment
+
+| Contract | Address | Deploy tx | Gas | Cost |
+|---|---|---|---|---|
+| `RadioactivePunksImageV2` | [`0x3b23042cC1E018914B315cAeC2801D357cE5B36e`](https://etherscan.io/address/0x3b23042cC1E018914B315cAeC2801D357cE5B36e) | [`0x0d03…2ea5`](https://etherscan.io/tx/0x0d03700b51ca59b3a7f3b774502b65b25fb2f797b66705ad9d0b0ebb44ef2ea5) | 1,366,357 | 0.0000926 ETH at 0.068 gwei |
+| `RadioactivePunksJSONV2` | [`0xB7ca6E7905641b0b49E5F6a5c9f1C527AC1cd4e7`](https://etherscan.io/address/0xB7ca6E7905641b0b49E5F6a5c9f1C527AC1cd4e7) | [`0xe262…9fc3`](https://etherscan.io/tx/0xe26208fe87d77e38143bdb5e067dccada5054a86633f68eee6c8927bc0489fc3) | 703,387 | 0.0000466 ETH at 0.066 gwei |
+| **Total** | | | **2,069,744** | **0.000139 ETH** (about $0.38 at $2,710) |
+
+Both were deployed with the deploy page's Bitmap upgrade tab (solc 0.8.20, 200 optimizer runs). After deploying, each was checked on-chain:
+
+- Each transaction's creation bytecode is the repo build, and each contract's deployed code matches it.
+- The constructor arguments are the expected addresses: `RadioactivePunksImageV2(0x60de…3e99, 0x4398…162f, 0xAB65…c0F2)` and `RadioactivePunksJSONV2(0x5694…4A26, 0x3b23…B36e)`.
+- For 17 punks, including all 10 one-of-ones, dead punks and a rainbow head, the new `tokenJSON("<id>.json")` is identical to the live `0xC36C…c5c3` output apart from `image`. Each `image` is byte-identical to `scripts/bitmap-svg.js`.
+
+The page first reported the image renderer as not matching the build. That was a false alarm: right after the receipt, the wallet's node returned no code for the new address. The page now reads the code at the receipt's block and retries.
+
+To switch the NFT contract to bitmap images, the owner Safe calls `setAPIBaseURL` with:
+
+```
+web3://0xB7ca6E7905641b0b49E5F6a5c9f1C527AC1cd4e7/tokenJSON/string!
+```
 
 Before switching the base URL, check the bitmap output where it matters: in Safari and Firefox as well as Chrome, and in the marketplaces' thumbnails, which may rasterize SVGs with their own renderer. A renderer that supports neither `image-rendering` value would show a blurry punk.
 
