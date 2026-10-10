@@ -356,6 +356,20 @@ async function validate(step) {
   }
 }
 
+/**
+ * The new contract's code, read at the block it was mined in. Right after the
+ * receipt, the wallet's node can still be behind that block and return no
+ * code, so this retries for a while; undefined if it never shows up.
+ */
+async function deployedCode(address, blockNumber) {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const code = await state.publicClient.getCode({ address, blockNumber }).catch(() => undefined);
+    if (code && code !== '0x') return code;
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+  }
+  return undefined;
+}
+
 async function deploy(step) {
   const button = $(`${step.id}-deploy`);
   const status = $(`${step.id}-status`);
@@ -371,7 +385,12 @@ async function deploy(step) {
     if (receipt.status !== 'success' || !receipt.contractAddress) throw new Error(`Transaction ${hash} failed.`);
 
     const address = getAddress(receipt.contractAddress);
-    const code = await state.publicClient.getCode({ address });
+    const code = await deployedCode(address, receipt.blockNumber);
+    if (!code) {
+      setStatus(status, 'warn', 'Deployed at ', link('address', address),
+        ', but your wallet’s node hasn’t returned its code yet, so it couldn’t be checked. Paste the address into the step that uses it; that field checks it against the tested build.');
+      return;
+    }
     if (!matchesBuild(step.contract, code)) {
       setStatus(status, 'err', 'Deployed, but the code at ', link('address', address), ' doesn’t match the tested build. Don’t use it.');
       return;
