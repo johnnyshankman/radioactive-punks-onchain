@@ -354,7 +354,7 @@ The NFT contract was never pointed at it. Checked before switching, the bitmaps 
 
 ## Image renderer V3 (`RadioactivePunksImageV3`)
 
-`RadioactivePunksImageV3` draws exactly the SVG `RadioactivePunksImage` draws, then the same pixels on top as V2's two PNGs, in HTML `<img>`s inside `<foreignObject>`s. It's not deployed yet.
+`RadioactivePunksImageV3` draws exactly the SVG `RadioactivePunksImage` draws, then the same pixels on top as V2's two PNGs, in HTML `<img>`s inside `<foreignObject>`s. It's deployed on mainnet with its own `RadioactivePunksJSONV2`, but the NFT contract's base URL doesn't point at it yet (see [Mainnet deployment](#mainnet-deployment-2)).
 
 ### Why
 
@@ -432,6 +432,29 @@ Deploy gas, measured on a local network:
 | **Total** | **2,293,406** |
 
 At the 0.066 to 0.068 gwei V2 was deployed at, that's about 0.00015 ETH.
+
+### Mainnet deployment
+
+| Contract | Address | Deploy tx | Gas | Cost |
+|---|---|---|---|---|
+| `RadioactivePunksImageV3` | [`0xa70882d8dc8C3ba853F00f3e8B300916d88FF651`](https://etherscan.io/address/0xa70882d8dc8C3ba853F00f3e8B300916d88FF651) | [`0xd081…b8cd`](https://etherscan.io/tx/0xd08141bba04c0440181c40e4248f0314bc242a88b018cd3b284e65979adeb8cd) | 1,590,019 | 0.0001008 ETH at 0.063 gwei |
+| `RadioactivePunksJSONV2` | [`0x17F358A4F231D4538Dfed0466FAd1316655EdEe2`](https://etherscan.io/address/0x17F358A4F231D4538Dfed0466FAd1316655EdEe2) | [`0x69d4…6f50`](https://etherscan.io/tx/0x69d4981529879b9d287b54ad2b7021b1f00cc337ba8f87ed9f353d7bec2e6f50) | 703,387 | 0.0000474 ETH at 0.067 gwei |
+| **Total** | | | **2,293,406** | **0.000148 ETH** |
+
+Both were deployed with the deploy page's V3 upgrade tab (solc 0.8.20, 200 optimizer runs). After deploying, each was checked on-chain:
+
+- Each transaction's creation bytecode is the repo build, and each contract's deployed code matches it.
+- The constructor arguments are the expected addresses: `RadioactivePunksImageV3(0x60de…3e99, 0x4398…162f, 0xAB65…c0F2)` and `RadioactivePunksJSONV2(0x5694…4A26, 0xa708…F651)`, and the JSON contract's `renderer()` and `image()` return them.
+- 18 punks rendered by the live `RadioactivePunksImageV3`, including all 10 one-of-ones, dead punks, red heads with clown noses and a rainbow head, are byte-identical to `toBitmapSVG(grid, 'paths+html')`.
+- For 19 punks, the new `tokenJSON("<id>.json")` equals `tokenJSON(<id>)` and is identical to the live `0xC36C…c5c3` output apart from `image`. Each `image` is byte-identical to the V3 reference. Malformed paths and nonexistent tokens revert.
+
+Before V3, a contract was deployed from the Full deploy tab by mistake: [`0x4262F8e727601FA0AE7E4820712108B08b9752E7`](https://etherscan.io/address/0x4262F8e727601FA0AE7E4820712108B08b9752E7) ([`0x44e7…7da3`](https://etherscan.io/tx/0x44e775d2e054e0bed6a41c320ab19ea7cb823c6a9f2c7005d4909b86a66a7da3), 1,037,238 gas, 0.0000639 ETH). It's a second copy of `RadioactivePunksImage`, and nothing points at it.
+
+To switch the NFT contract to V3, the owner Safe calls `setAPIBaseURL` with:
+
+```
+web3://0x17F358A4F231D4538Dfed0466FAd1316655EdEe2/tokenJSON/string!
+```
 
 Before switching the base URL, check V3 in Firefox and on an iPhone, and on the marketplaces after the switch.
 

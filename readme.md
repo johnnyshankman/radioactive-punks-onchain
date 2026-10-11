@@ -57,7 +57,7 @@ Deployment is modular and split across five main components:
 
 `RadioactivePunksImageV2`: the same image drawn as two PNG bitmaps inside the SVG, so it has no seams between colors at any size. Deployed at `0x3b23042cC1E018914B315cAeC2801D357cE5B36e` with its own `RadioactivePunksJSONV2` at `0xB7ca6E7905641b0b49E5F6a5c9f1C527AC1cd4e7`, reusing the deployed layer data. Nothing points at it: Safari blurs it (see [image-renderer.md](image-renderer.md#bitmap-images-radioactivepunksimagev2))
 
-`RadioactivePunksImageV3`: `RadioactivePunksImage`'s paths with V2's bitmaps on top as HTML images, so browsers including Safari draw it sharp with no seams, and other renderers fall back to the paths. Not deployed yet (see [image-renderer.md](image-renderer.md#image-renderer-v3-radioactivepunksimagev3))
+`RadioactivePunksImageV3`: `RadioactivePunksImage`'s paths with V2's bitmaps on top as HTML images, so browsers including Safari draw it sharp with no seams, and other renderers fall back to the paths. Deployed at `0xa70882d8dc8C3ba853F00f3e8B300916d88FF651` with its own `RadioactivePunksJSONV2` at `0x17F358A4F231D4538Dfed0466FAd1316655EdEe2`. The NFT's base URL doesn't point at it yet (see [image-renderer.md](image-renderer.md#image-renderer-v3-radioactivepunksimagev3))
 
 `RadioactivePunksBytesHyperstructure`: the encoded trait data of every punk as bytes in groups of 15
 
