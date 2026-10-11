@@ -14,6 +14,8 @@
 
 This replaces the interactive `animation_url` HTML page served by `RadioactivePunksJSON` with a plain image that marketplaces can show directly in thumbnails and grids.
 
+**Live today:** the NFT contract's metadata comes from [Image renderer V3](#image-renderer-v3-radioactivepunksimagev3) (`RadioactivePunksImageV3`), which draws the same art without seams between colors. It reuses everything below except the image contract and one `RadioactivePunksJSONV2` instance.
+
 ## Why
 
 Marketplaces use `image` for thumbnails, collection grids and previews. The original on-chain metadata only has an `animation_url`: an HTML page that unzips the art in the browser and stacks it with JavaScript. Without an `image`, punks may show up blank in grids.
@@ -225,7 +227,7 @@ Measured deploy gas, priced at 0.078 gwei and $2,700 per ETH:
 
 ### Pointing the NFT contract at it
 
-The original NFT contract (`0x073ca28e04719c05a5a48c1d992091b4075a0f84`) now uses this as its base URL, set with `setAPIBaseURL` through its owner, a Safe (`0x780Bf192F272e935985b614Db9Dee1027606b93c`), in [`0x6f24…cd26`](https://etherscan.io/tx/0x6f244952d440c886de3281007c75e925cd3422bf0f63a54d5d9d2ce447e3cd26):
+The original NFT contract (`0x073ca28e04719c05a5a48c1d992091b4075a0f84`) used this as its base URL until [V3](#image-renderer-v3-radioactivepunksimagev3) replaced it. It was set with `setAPIBaseURL` through its owner, a Safe (`0x780Bf192F272e935985b614Db9Dee1027606b93c`), in [`0x6f24…cd26`](https://etherscan.io/tx/0x6f244952d440c886de3281007c75e925cd3422bf0f63a54d5d9d2ce447e3cd26):
 
 ```
 web3://0xC36C3b966e227F7a68C49512b4bdb4Ca7643c5c3/tokenJSON/string!
@@ -354,7 +356,7 @@ The NFT contract was never pointed at it. Checked before switching, the bitmaps 
 
 ## Image renderer V3 (`RadioactivePunksImageV3`)
 
-`RadioactivePunksImageV3` draws exactly the SVG `RadioactivePunksImage` draws, then the same pixels on top as V2's two PNGs, in HTML `<img>`s inside `<foreignObject>`s. It's deployed on mainnet with its own `RadioactivePunksJSONV2`, but the NFT contract's base URL doesn't point at it yet (see [Mainnet deployment](#mainnet-deployment-2)).
+`RadioactivePunksImageV3` draws exactly the SVG `RadioactivePunksImage` draws, then the same pixels on top as V2's two PNGs, in HTML `<img>`s inside `<foreignObject>`s. It's deployed on mainnet with its own `RadioactivePunksJSONV2`, and it's what the NFT contract's metadata uses (see [Mainnet deployment](#mainnet-deployment-2)).
 
 ### Why
 
@@ -450,13 +452,15 @@ Both were deployed with the deploy page's V3 upgrade tab (solc 0.8.20, 200 optim
 
 Before V3, a contract was deployed from the Full deploy tab by mistake: [`0x4262F8e727601FA0AE7E4820712108B08b9752E7`](https://etherscan.io/address/0x4262F8e727601FA0AE7E4820712108B08b9752E7) ([`0x44e7…7da3`](https://etherscan.io/tx/0x44e775d2e054e0bed6a41c320ab19ea7cb823c6a9f2c7005d4909b86a66a7da3), 1,037,238 gas, 0.0000639 ETH). It's a second copy of `RadioactivePunksImage`, and nothing points at it.
 
-To switch the NFT contract to V3, the owner Safe calls `setAPIBaseURL` with:
+The owner Safe switched the NFT contract to V3 with `setAPIBaseURL` in [`0xc8ac…b373`](https://etherscan.io/tx/0xc8acf516b2410e7aa65db821f499e6b01260d98ba995d95724cef04db06eb373) (block 26,166,387):
 
 ```
 web3://0x17F358A4F231D4538Dfed0466FAd1316655EdEe2/tokenJSON/string!
 ```
 
-Before switching the base URL, check V3 in Firefox and on an iPhone, and on the marketplaces after the switch.
+So `tokenURI(6)` returns `web3://0x17F358A4F231D4538Dfed0466FAd1316655EdEe2/tokenJSON/string!6.json`. Marketplaces showed the V3 images after a metadata refresh.
+
+To roll back to the path-only images, set the base URL back to `web3://0xC36C3b966e227F7a68C49512b4bdb4Ca7643c5c3/tokenJSON/string!`.
 
 ## Testing
 
